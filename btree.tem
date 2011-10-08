@@ -1,0 +1,67 @@
+#include <algorithm>
+
+template <typename T>
+btree<T>::btree(size_t maxNodeElems) : maxNodeElems(maxNodeElems), prev_(Const::null) { 
+    nodes_type nodes();
+}
+
+template <typename T>
+btree<T>::btree(const btree<T>& original) {
+    
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const btree<T>& tree) {
+    for (typename btree<T>::nodes_type::const_iterator it = tree.nodes.begin(); 
+         it != tree.nodes.end(); ++it) {
+        os << *it;
+    }
+    return os;
+}
+
+template <typename T>
+std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T& elem) {
+    if (nodeElems() < maxNodeElems) { // no need for branching
+        nodes.push_back(Node(elem));
+        //nodes.insert(Node(elem));
+    } else { // put the elem in a sub-btree
+
+        //// The new sub-btree
+        //btree<T>* subtree = new btree<T>(maxNodeElems);
+        //subtree->insert(elem);
+        //cout << *subtree << endl;
+
+        //// iterators to nodes
+        //typedef typename nodes_type::iterator nodes_iterator_type;
+        //nodes_iterator_type top_right = nodes.lower_bound(Node(elem));
+        //nodes_iterator_type top_left = top_right; --top_left;
+
+        //// modify the nodes
+        //Node tmp_left(top_left->elem_, top_left->left_, subtree);
+        //Node tmp_right(top_right->elem_, subtree, top_right->right_);
+        //nodes.erase(top_right); nodes.insert(tmp_right);
+        //nodes.erase(top_left); nodes.insert(tmp_left);
+        
+        
+        
+        //lower->left_ = Const::null;
+    }
+}
+
+template <typename T>
+btree<T>::~btree() {
+    cout << "~btree" << endl;
+    // Nodes will destroy their right branch therefore
+    // remember to destroy the first left most branch
+    if (nodeElems() > 0) {
+        btree* leftTree = nodes.begin()->left_;
+        if (leftTree != Const::null) leftTree->~btree();
+    }
+}
+
+template <typename T>
+size_t btree<T>::nodeElems() {
+    return nodes.size();
+}                                                                           
+
+
