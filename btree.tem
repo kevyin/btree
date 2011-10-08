@@ -21,26 +21,23 @@ std::ostream& operator<<(std::ostream& os, const btree<T>& tree) {
 
 template <typename T>
 std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T& elem) {
+    Node n(elem);
     if (nodeElems() < maxNodeElems) { // no need for branching
-        nodes.push_back(Node(elem));
-        //nodes.insert(Node(elem));
+        nodes.insert(n);
     } else { // put the elem in a sub-btree
 
-        //// The new sub-btree
-        //btree<T>* subtree = new btree<T>(maxNodeElems);
-        //subtree->insert(elem);
-        //cout << *subtree << endl;
+        // The new sub-btree
+        btree<T>* subtree = new btree<T>(maxNodeElems);
+        subtree->insert(elem);
+        cout << "new subtree " << *subtree << endl;
 
-        //// iterators to nodes
-        //typedef typename nodes_type::iterator nodes_iterator_type;
-        //nodes_iterator_type top_right = nodes.lower_bound(Node(elem));
-        //nodes_iterator_type top_left = top_right; --top_left;
+        // iterators to nodes
+        nodes_iterator_type top_right = nodes.lower_bound(n);
+        //nodes_iterator_type top_left = top_right - 1;
 
-        //// modify the nodes
-        //Node tmp_left(top_left->elem_, top_left->left_, subtree);
-        //Node tmp_right(top_right->elem_, subtree, top_right->right_);
-        //nodes.erase(top_right); nodes.insert(tmp_right);
-        //nodes.erase(top_left); nodes.insert(tmp_left);
+        // modify the nodes
+        top_right->left_ = subtree;
+        --top_right->right_ = subtree;
         
         
         
@@ -63,5 +60,3 @@ template <typename T>
 size_t btree<T>::nodeElems() {
     return nodes.size();
 }                                                                           
-
-

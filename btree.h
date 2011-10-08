@@ -17,7 +17,8 @@
 #include <iostream>
 #include <cstddef>
 #include <utility>
-#include <vector>
+#include <deque>
+#include <set>
 
 namespace Const {
     const int null = 0;
@@ -177,8 +178,8 @@ class btree {
             }
 
             T elem_;
-            btree*       left_;
-            btree*       right_;
+            mutable btree*       left_;
+            mutable btree*       right_;
 
             struct NodeComp {
                 bool operator() (const Node& l, const Node& r) {
@@ -195,8 +196,10 @@ class btree {
 
 
         // Types
-        typedef vector<Node>                nodes_type;
-        typedef std::pair<iterator, bool>   insert_res_type;
+        //typedef deque<Node>                     nodes_type;
+        typedef set<Node, typename Node::NodeComp> nodes_type;
+        typedef typename nodes_type::iterator   nodes_iterator_type;
+        typedef std::pair<iterator, bool>       insert_res_type;
 
         // Private members
         Node* prev_;
