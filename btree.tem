@@ -31,13 +31,12 @@ std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T& elem) {
         subtree->insert(elem);
         cout << "new subtree " << *subtree << endl;
 
-        // iterators to nodes
-        nodes_iterator_type top_right = nodes.lower_bound(n);
-        //nodes_iterator_type top_left = top_right - 1;
+        // find insert pos to insert sub-btree
+        nodes_iterator_type pos = nodes.lower_bound(n);
 
         // modify the nodes
-        top_right->left_ = subtree;
-        --top_right->right_ = subtree;
+        if (pos != nodes.end()) pos->left_ = subtree; // top right node
+        if (pos != nodes.begin()) --pos->right_ = subtree; // top left node
         
         
         
