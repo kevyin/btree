@@ -1,7 +1,9 @@
 #include <algorithm>
 
 template <typename T>
-btree<T>::btree(size_t maxNodeElems) : maxNodeElems(maxNodeElems), prev_(Const::null) { 
+btree<T>::btree(size_t maxNodeElems) : maxNodeElems(maxNodeElems), 
+                                       top_left_(Const::null), 
+                                       top_right_(Const::null) { 
     nodes_type nodes();
 }
 
@@ -34,8 +36,9 @@ std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T& elem) {
         // find insert pos to insert sub-btree
         nodes_iterator_type pos = nodes.lower_bound(n);
 
-        // modify the nodes
-        if (pos != nodes.end()) pos->left_ = subtree; // top right node
+        // modify the pointers
+        if (pos != nodes.end())     pos->left_ = subtree; // top right node
+        
         if (pos != nodes.begin()) --pos->right_ = subtree; // top left node
         
         

@@ -164,8 +164,22 @@ class btree {
 
 
     private:
+
+        struct btreePtr {
+            public:
+            btree* operator->() { return bt_; }
+            btree& operator*() { return *bt_; }
+
+            btreePtr(btree* bt) : bt_(bt) { ++bt_->refcount; } 
+            ~btreePtr() { if (--bt_->refCount == 0) delete bt_; }
+
+            private:
+
+            btree* bt_;
+        };
         
         struct Node {
+            public:
             Node(const T& e) : elem_(e), left_(Const::null), right_(Const::null) {}
             Node(const T& e, btree* l, btree* r) : elem_(e), left_(l), right_(r) {}
             //Node(const T& e, btree* l, btree* r) : elem_(e), left_(l), right_(r) {}
@@ -176,11 +190,7 @@ class btree {
                 //if (right_ != Const::null) right_->~btree();
                 delete right_;
             }
-
-            T elem_;
-            mutable btree*       left_;
-            mutable btree*       right_;
-
+            btree* owner; // the btree this node belongs to. 
             struct NodeComp {
                 bool operator() (const Node& l, const Node& r) {
                     return l.elem_ < r.elem_;
@@ -192,6 +202,21 @@ class btree {
                 return os;
             }
 
+            private:
+            T elem_;
+            mutable btree*       left_;
+            mutable btree*       right_;
+
+            int refCount;
+        };
+
+        struct NodePtr {
+            public:
+
+            ~NodePtr() { if (--node_->refCount == 0) delete node_; }
+
+            private:
+            Node* node_;
         };
 
 
@@ -202,7 +227,8 @@ class btree {
         typedef std::pair<iterator, bool>       insert_res_type;
 
         // Private members
-        Node* prev_;
+        Node* top_left_;
+        Node* top_right_;
 
         nodes_type  nodes;
         size_t      maxNodeElems;
@@ -210,7 +236,6 @@ class btree {
         // Functions
         size_t nodeElems();
 };
-
 
 /**
  * The template implementation needs to be visible to whatever
