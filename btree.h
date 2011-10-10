@@ -170,7 +170,7 @@ class btree {
             btree* operator->() { return bt_; }
             btree& operator*() { return *bt_; }
 
-            btreePtr(btree* bt) : bt_(bt) { ++bt_->refcount; } 
+            btreePtr(btree* bt) : bt_(bt) { ++bt_->refCount; } 
             ~btreePtr() { if (--bt_->refCount == 0) delete bt_; }
 
             private:
@@ -212,11 +212,14 @@ class btree {
 
         struct NodePtr {
             public:
+            Node* operator->() { return n_; }
+            Node& operator*() { return *n_; }
 
-            ~NodePtr() { if (--node_->refCount == 0) delete node_; }
+            NodePtr(Node* n) : n_(n) { ++ n_->refCount; }
+            ~NodePtr() { if (--n_->refCount == 0) delete n_; }
 
             private:
-            Node* node_;
+            Node* n_;
         };
 
 
@@ -229,6 +232,7 @@ class btree {
         // Private members
         Node* top_left_;
         Node* top_right_;
+        int refCount;
 
         nodes_type  nodes;
         size_t      maxNodeElems;
