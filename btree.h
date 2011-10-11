@@ -165,6 +165,7 @@ class btree {
 
     private:
 
+        typedef int sometype;
         struct Node {
             public:
             Node(const T& e) : elem_(e) { refCount = 0; }
@@ -237,12 +238,12 @@ class btree {
         struct bt_ {
             // Types
             //typedef deque<Node>                     nodes_type;
-            typedef set<NodePtr>                    bt_nodes_type;
-            typedef typename bt_nodes_type::iterator   bt_nodes_iterator_type;
+            typedef set<NodePtr>                    nodes_type;
+            typedef typename nodes_type::iterator   nodes_iterator_type;
             //typedef std::pair<iterator, bool>       insert_res_type;
            
             bt_(size_t max) : maxNodeElems(max) {
-                bt_nodes_type nodes();
+                nodes_type nodes();
             }
 
 
@@ -250,14 +251,17 @@ class btree {
             NodePtr top_right_;
             mutable int refCount;
 
-            bt_nodes_type  nodes;
+            nodes_type  nodes;
             size_t      maxNodeElems;
 
             // Functions
             size_t nodeElems() { return nodes.size(); }
             
         };
-        
+
+        // types
+        typedef typename bt_::nodes_type     bt_nodes_type;
+
         bt_* operator->() { return tree_; }
         bt_* operator->() const { return tree_; }
         bt_& operator*() { return *tree_; }
@@ -281,6 +285,7 @@ class btree {
 
         // private members
         bt_* tree_;
+        size_t maxNodeElems;
         
         // private functions
         bool isNull() { return tree_ == Const::null; }

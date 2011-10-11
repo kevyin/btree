@@ -1,7 +1,7 @@
 #include <algorithm>
 
 template <typename T>
-btree<T>::btree(size_t maxNodeElems) : tree_(new bt_(maxNodeElems)) {}
+btree<T>::btree(size_t maxNodeElems) : tree_(new bt_(maxNodeElems)), maxNodeElems(maxNodeElems) {}
 
 template <typename T>
 btree<T>::btree(const btree<T>& original) {
@@ -9,21 +9,21 @@ btree<T>::btree(const btree<T>& original) {
 }
 
 template <typename T>
-std::ostream& operator<<(std::ostream& os, const btree<T>& tree) {
-    //for (typename btree<T>::nodes_type::const_iterator it = tree.nodes.begin(); 
-         //it != tree.nodes.end(); ++it) {
-        //os << *it;
-    //}
+std::ostream& operator<<(std::ostream& os, const btree<T>& btree) {
+    for (typename ::btree<T>::bt_::nodes_type::const_iterator it = btree->nodes.begin(); 
+         it != btree->nodes.end(); ++it) {
+        os << *it;          
+    }
     return os;
 }
 
 template <typename T>
 std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T& elem) {
-    //NodePtr new_node(new Node(elem));
+    NodePtr new_node(new Node(elem));
 
-    //if (nodeElems() < maxNodeElems) { // no need for branching
-        //nodes.insert(new_node);
-    //} else { // put the elem in a sub-btree
+    if (nodeElems() < maxNodeElems) { // no need for branching
+        tree_->nodes.insert(new_node);
+    } else { // put the elem in a sub-btree
 
         //// find pos of subtree
         //nodes_iterator_type pos = nodes.lower_bound(new_node);
@@ -45,7 +45,7 @@ std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T& elem) {
             //(*top_left)->right_ = subbt; // top left node
         
         
-    //}
+    }
 }
 
 template <typename T>
