@@ -165,33 +165,6 @@ class btree {
 
     private:
 
-        struct btreePtr {
-            public:
-            btree* operator->() { return bt_; }
-            btree* operator->() const { return bt_; }
-            btree& operator*() { return *bt_; }
-            btree& operator*() const { return *bt_; }
-
-            btreePtr() : bt_(Const::null) {}
-            btreePtr(btree* bt) : bt_(bt) { ++bt_->refCount; } 
-            ~btreePtr() { if (bt_ != Const::null && --bt_->refCount == 0) delete bt_; }
-
-            btreePtr(const btreePtr& rhs) : bt_(rhs.bt_) { ++bt_->refCount; }
-            btreePtr& operator=(const btreePtr& rhs) {
-                if (bt_ == rhs.bt_) 
-                    return *this;
-                if (bt_ != Const::null && --bt_->refCount == 0)
-                    delete bt_;
-
-                bt_ = rhs.bt_;
-                ++bt_->refCount;
-                return *this;
-            }
-            private:
-
-            btree* bt_;
-        };
-        
         struct Node {
             public:
             Node(const T& e) : elem_(e) { refCount = 0; }
@@ -205,7 +178,7 @@ class btree {
                 //if (right_ != Const::null) right_->~btree();
                 //delete right_;
             }
-            //btree* owner; // the btree this node belongs to. 
+            btree owner; // the btree this node belongs to. 
 
             friend std::ostream& operator<<(std::ostream& os, const Node& n) {
                 os << n.elem_;
@@ -216,9 +189,9 @@ class btree {
                 return l.elem_ < r.elem_;
             }
 
-            T elem_;
-            btreePtr       left_;
-            btreePtr       right_;
+            T       elem_;
+            btree   left_;
+            btree   right_;
 
             private:
             int refCount;
@@ -231,17 +204,18 @@ class btree {
             Node& operator*() { return *n_; }
             Node& operator*() const { return *n_; }
 
+            NodePtr() : n_(Const::null) {}
             NodePtr(Node* n) : n_(n) { ++n_->refCount; }
-            ~NodePtr() { if (--n_->refCount == 0) delete n_; }
-            NodePtr(const NodePtr& rhs) : n_(rhs.n_) { ++n_->refCount; }
+            ~NodePtr() { if (!isNull() && --n_->refCount == 0) delete n_; }
+            NodePtr(const NodePtr& rhs) : n_(rhs.n_) { if (!isNull()) ++n_->refCount; }
             NodePtr& operator=(const NodePtr& rhs) {
                 if (n_ == rhs.n_) 
                     return *this;
-                if (--n_->refCount == 0)
+                if (!isNull() && --n_->refCount == 0)
                     delete n_;
 
                 n_ = rhs.n_;
-                ++n_->refCount;
+                if (!isNull()) ++n_->refCount;
                 return *this;
             }
                 
@@ -256,26 +230,62 @@ class btree {
             }
 
             private:
+            bool isNull() { return n_ == Const::null; }
             Node* n_;
         };
 
+        struct bt_ {
+            // Types
+            //typedef deque<Node>                     nodes_type;
+            typedef set<NodePtr>                    bt_nodes_type;
+            typedef typename bt_nodes_type::iterator   bt_nodes_iterator_type;
+            //typedef std::pair<iterator, bool>       insert_res_type;
+           
+            bt_(size_t max) : maxNodeElems(max) {
+                bt_nodes_type nodes();
+            }
 
-        // Types
-        //typedef deque<Node>                     nodes_type;
-        typedef set<NodePtr> nodes_type;
-        typedef typename nodes_type::iterator   nodes_iterator_type;
-        typedef std::pair<iterator, bool>       insert_res_type;
 
-        // Private members
-        Node* top_left_;
-        Node* top_right_;
-        mutable int refCount;
+            NodePtr top_left_;
+            NodePtr top_right_;
+            mutable int refCount;
 
-        nodes_type  nodes;
-        size_t      maxNodeElems;
+            bt_nodes_type  nodes;
+            size_t      maxNodeElems;
 
-        // Functions
+            // Functions
+            size_t nodeElems() { return nodes.size(); }
+            
+        };
+        
+        bt_* operator->() { return tree_; }
+        bt_* operator->() const { return tree_; }
+        bt_& operator*() { return *tree_; }
+        bt_& operator*() const { return *tree_; }
+
+        //btreePtr() : tree_(Const::null) {}
+        //bt_Ptr(bt_* bt) : tree_(bt) { ++tree_->refCount; } 
+        //~btreePtr() { if (tree_ != Const::null && --tree_->refCount == 0) delete tree_; }
+
+        //btreePtr(const btreePtr& rhs) : tree_(rhs.tree_) { ++tree_->refCount; }
+        //btreePtr& operator=(const btreePtr& rhs) {
+            //if (tree_ == rhs.tree_) 
+                //return *this;
+            //if (tree_ != Const::null && --tree_->refCount == 0)
+                //delete tree_;
+
+            //tree_ = rhs.tree_;
+            //++tree_->refCount;
+            //return *this;
+        //}
+
+        // private members
+        bt_* tree_;
+        
+        // private functions
+        bool isNull() { return tree_ == Const::null; }
         size_t nodeElems();
+
 };
 
 /**
