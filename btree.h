@@ -168,11 +168,25 @@ class btree {
         struct btreePtr {
             public:
             btree* operator->() { return bt_; }
+            btree* operator->() const { return bt_; }
             btree& operator*() { return *bt_; }
+            btree& operator*() const { return *bt_; }
 
+            btreePtr() : bt_(Const::null) {}
             btreePtr(btree* bt) : bt_(bt) { ++bt_->refCount; } 
-            ~btreePtr() { if (--bt_->refCount == 0) delete bt_; }
+            ~btreePtr() { if (bt_ != Const::null && --bt_->refCount == 0) delete bt_; }
 
+            btreePtr(const btreePtr& rhs) : bt_(rhs.bt_) { ++bt_->refCount; }
+            btreePtr& operator=(const btreePtr& rhs) {
+                if (bt_ == rhs.bt_) 
+                    return *this;
+                if (bt_ != Const::null && --bt_->refCount == 0)
+                    delete bt_;
+
+                bt_ = rhs.bt_;
+                ++bt_->refCount;
+                return *this;
+            }
             private:
 
             btree* bt_;
@@ -180,43 +194,66 @@ class btree {
         
         struct Node {
             public:
-            Node(const T& e) : elem_(e), left_(Const::null), right_(Const::null) {}
-            Node(const T& e, btree* l, btree* r) : elem_(e), left_(l), right_(r) {}
+            Node(const T& e) : elem_(e) { refCount = 0; }
+            //Node(const T& e, btreePtr l, btreePtr r) : elem_(e), refCount(0), 
+                                                   //left_(l), right_(r) {}
             //Node(const T& e, btree* l, btree* r) : elem_(e), left_(l), right_(r) {}
             ~Node() {
-                cout << "~node" << endl;
+                //cout << "~node" << endl;
                 //if (left_ != Const::null) left_->~btree();
                 //delete left_;
                 //if (right_ != Const::null) right_->~btree();
-                delete right_;
+                //delete right_;
             }
-            btree* owner; // the btree this node belongs to. 
-            struct NodeComp {
-                bool operator() (const Node& l, const Node& r) {
-                    return l.elem_ < r.elem_;
-                }
-            };
+            //btree* owner; // the btree this node belongs to. 
 
             friend std::ostream& operator<<(std::ostream& os, const Node& n) {
                 os << n.elem_;
                 return os;
             }
 
-            private:
-            T elem_;
-            mutable btree*       left_;
-            mutable btree*       right_;
+            friend bool operator< (const Node& l, const Node& r) {
+                return l.elem_ < r.elem_;
+            }
 
+            T elem_;
+            btreePtr       left_;
+            btreePtr       right_;
+
+            private:
             int refCount;
         };
 
         struct NodePtr {
             public:
             Node* operator->() { return n_; }
+            Node* operator->() const { return n_; }
             Node& operator*() { return *n_; }
+            Node& operator*() const { return *n_; }
 
-            NodePtr(Node* n) : n_(n) { ++ n_->refCount; }
+            NodePtr(Node* n) : n_(n) { ++n_->refCount; }
             ~NodePtr() { if (--n_->refCount == 0) delete n_; }
+            NodePtr(const NodePtr& rhs) : n_(rhs.n_) { ++n_->refCount; }
+            NodePtr& operator=(const NodePtr& rhs) {
+                if (n_ == rhs.n_) 
+                    return *this;
+                if (--n_->refCount == 0)
+                    delete n_;
+
+                n_ = rhs.n_;
+                ++n_->refCount;
+                return *this;
+            }
+                
+
+            friend bool operator< (const NodePtr& l, const NodePtr& r) {
+                return *l < *r;
+            }
+
+            friend std::ostream& operator<<(std::ostream& os, const NodePtr& np) {
+                os << *np;
+                return os;
+            }
 
             private:
             Node* n_;
@@ -225,14 +262,14 @@ class btree {
 
         // Types
         //typedef deque<Node>                     nodes_type;
-        typedef set<Node, typename Node::NodeComp> nodes_type;
+        typedef set<NodePtr> nodes_type;
         typedef typename nodes_type::iterator   nodes_iterator_type;
         typedef std::pair<iterator, bool>       insert_res_type;
 
         // Private members
         Node* top_left_;
         Node* top_right_;
-        int refCount;
+        mutable int refCount;
 
         nodes_type  nodes;
         size_t      maxNodeElems;

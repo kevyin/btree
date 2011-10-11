@@ -23,39 +23,44 @@ std::ostream& operator<<(std::ostream& os, const btree<T>& tree) {
 
 template <typename T>
 std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T& elem) {
-    Node n(elem);
+    NodePtr new_node(new Node(elem));
+
     if (nodeElems() < maxNodeElems) { // no need for branching
-        nodes.insert(n);
+        nodes.insert(new_node);
     } else { // put the elem in a sub-btree
 
+        // find pos of subtree
+        nodes_iterator_type pos = nodes.lower_bound(new_node);
+        nodes_iterator_type top_right = pos;
+        nodes_iterator_type top_left = (top_right != nodes.begin()) ? --pos : pos;
+
+        cout << "INSERTING into new SUB TREE" << endl;
         // The new sub-btree
-        btree<T>* subtree = new btree<T>(maxNodeElems);
-        subtree->insert(elem);
-        cout << "new subtree " << *subtree << endl;
+        btreePtr subbt(new btree<T>(maxNodeElems));
+        insert_res_type res = subbt->insert(elem);
+        //cout << "new subtree " << *subtree << endl;
 
-        // find insert pos to insert sub-btree
-        nodes_iterator_type pos = nodes.lower_bound(n);
 
-        // modify the pointers
-        if (pos != nodes.end())     pos->left_ = subtree; // top right node
+        // modify the left right pointers in nodes above
+        if (top_right != nodes.end())  
+            (*top_right)->left_ = subbt; // top right node
         
-        if (pos != nodes.begin()) --pos->right_ = subtree; // top left node
+        if (top_right != nodes.begin())  
+            (*top_left)->right_ = subbt; // top left node
         
         
-        
-        //lower->left_ = Const::null;
     }
 }
 
 template <typename T>
 btree<T>::~btree() {
-    cout << "~btree" << endl;
+    //cout << "~btree" << endl;
     // Nodes will destroy their right branch therefore
     // remember to destroy the first left most branch
-    if (nodeElems() > 0) {
-        btree* leftTree = nodes.begin()->left_;
-        if (leftTree != Const::null) leftTree->~btree();
-    }
+    //if (nodeElems() > 0) {
+        //btree* leftTree = nodes.begin()->left_;
+        //if (leftTree != Const::null) leftTree->~btree();
+    //}
 }
 
 template <typename T>
