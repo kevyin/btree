@@ -235,14 +235,14 @@ class btree {
             Node* n_;
         };
 
-        struct bt_ {
+        struct BTree {
             // Types
             //typedef deque<Node>                     nodes_type;
             typedef set<NodePtr>                    nodes_type;
             typedef typename nodes_type::iterator   nodes_iterator_type;
             //typedef std::pair<iterator, bool>       insert_res_type;
            
-            bt_(size_t max) : maxNodeElems(max) {
+            BTree(size_t max) : maxNodeElems_(max) {
                 nodes_type nodes();
             }
 
@@ -251,45 +251,47 @@ class btree {
             NodePtr top_right_;
             mutable int refCount;
 
-            nodes_type  nodes;
-            size_t      maxNodeElems;
+            nodes_type  nodes_;
+            size_t      maxNodeElems_;
 
             // Functions
-            size_t nodeElems() { return nodes.size(); }
+            size_t nodeElems() { return nodes_.size(); }
             
         };
 
-        // types
-        typedef typename bt_::nodes_type     bt_nodes_type;
+        struct BTreePtr {
 
-        bt_* operator->() { return tree_; }
-        bt_* operator->() const { return tree_; }
-        bt_& operator*() { return *tree_; }
-        bt_& operator*() const { return *tree_; }
+            BTreePtr(BTree* bt) : btree_(bt) { ++btree_->refCount; } 
+            
+            BTree* operator->() { return btree_; }
+            BTree* operator->() const { return btree_; }
+            BTree& operator*() { return *btree_; }
+            BTree& operator*() const { return *btree_; }
+            
+            //BtreePtr() : tree_(Const::null) {}
+            ~BTreePtr() { if (btree_ != Const::null && --btree_->refCount == 0) delete btree_; }
 
-        //btreePtr() : tree_(Const::null) {}
-        //bt_Ptr(bt_* bt) : tree_(bt) { ++tree_->refCount; } 
-        //~btreePtr() { if (tree_ != Const::null && --tree_->refCount == 0) delete tree_; }
+            BTreePtr(const BTreePtr& rhs) : btree_(rhs.btree_) { ++btree_->refCount; }
+            BTreePtr& operator=(const BTreePtr& rhs) {
+                if (btree_ == rhs.btree_) 
+                    return *this;
+                if (btree_ != Const::null && --btree_->refCount == 0)
+                    delete btree_;
 
-        //btreePtr(const btreePtr& rhs) : tree_(rhs.tree_) { ++tree_->refCount; }
-        //btreePtr& operator=(const btreePtr& rhs) {
-            //if (tree_ == rhs.tree_) 
-                //return *this;
-            //if (tree_ != Const::null && --tree_->refCount == 0)
-                //delete tree_;
-
-            //tree_ = rhs.tree_;
-            //++tree_->refCount;
-            //return *this;
-        //}
+                btree_ = rhs.btree_;
+                ++btree_->refCount;
+                return *this;
+            }
+            
+            BTree* btree_;
+        };
 
         // private members
-        bt_* tree_;
-        size_t maxNodeElems;
+        BTreePtr btree_;
+        size_t maxNodeElems_;
         
         // private functions
-        bool isNull() { return tree_ == Const::null; }
-        size_t nodeElems();
+        bool isNull() { return btree_ == Const::null; }
 
 };
 

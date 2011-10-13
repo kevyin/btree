@@ -12,8 +12,8 @@ BOOST_AUTO_TEST_CASE( constructors ) {
     cout << "Constructors" << endl;
 
     btree<int> tree(4);
-    BOOST_CHECK_EQUAL(tree->maxNodeElems, 4);
-    BOOST_CHECK_EQUAL(tree.nodeElems(), 0);
+    BOOST_CHECK_EQUAL(tree.maxNodeElems_, 4);
+    //BOOST_CHECK_EQUAL(tree.nodeElems(), 0);
     cout << "finished Constructors" << endl;
 } 
 
@@ -21,8 +21,8 @@ BOOST_AUTO_TEST_CASE( test_insert ) {
     cout << "insert" << endl;
 
     btree<int> tree(4);
-    BOOST_CHECK_EQUAL(tree->maxNodeElems, 4);
-    BOOST_CHECK_EQUAL(tree.nodeElems(), 0);
+    BOOST_CHECK_EQUAL(tree.maxNodeElems_, 4);
+    BOOST_CHECK_EQUAL(tree.btree_->nodeElems(), 0);
 
     tree.insert(2);
     tree.insert(8);
