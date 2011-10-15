@@ -261,6 +261,13 @@ class btree {
 
             // Functions
             size_t nodeElems() { return nodes_.size(); }
+            friend std::ostream& operator<<(std::ostream& os, const BTree& bt) {
+                for (typename nodes_type::const_iterator it = bt.nodes_.begin();
+                     it != bt.nodes_.end(); ++it) {
+                    os << *it;
+                }
+                return os;
+            }
             
         };
 

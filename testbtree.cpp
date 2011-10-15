@@ -29,6 +29,7 @@ BOOST_AUTO_TEST_CASE( test_insert ) {
     tree.insert(8);
     tree.insert(3);
     tree.insert(4);
+    tree.insert(6);
     tree.insert(5);
     cout << tree << endl;
 
