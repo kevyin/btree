@@ -165,21 +165,24 @@ class btree {
 
     private:
 
-        typedef int sometype;
+        typedef std::pair<iterator, bool> insert_res_type;
+        struct BTreePtr;
+
         struct Node {
             public:
             Node(const T& e) : elem_(e) { refCount = 0; }
-            //Node(const T& e, btreePtr l, btreePtr r) : elem_(e), refCount(0), 
+            //Node(const T& e, BtreePtr l, BtreePtr r) : elem_(e), refCount(0), 
                                                    //left_(l), right_(r) {}
             //Node(const T& e, btree* l, btree* r) : elem_(e), left_(l), right_(r) {}
             ~Node() {
-                //cout << "~node" << endl;
+                cout << "~Node()" << endl;
+                if (!left_.isNull()) left_->nodes_.clear();
+                if (!right_.isNull()) right_->nodes_.clear();
                 //if (left_ != Const::null) left_->~btree();
                 //delete left_;
                 //if (right_ != Const::null) right_->~btree();
                 //delete right_;
             }
-            btree owner; // the btree this node belongs to. 
 
             friend std::ostream& operator<<(std::ostream& os, const Node& n) {
                 os << n.elem_;
@@ -191,15 +194,14 @@ class btree {
             }
 
             T       elem_;
-            btree   left_;
-            btree   right_;
+            BTreePtr owner_; // the btree this node belongs to. 
+            BTreePtr left_;
+            BTreePtr right_;
 
-            private:
             int refCount;
         };
 
         struct NodePtr {
-            public:
             Node* operator->() { return n_; }
             Node* operator->() const { return n_; }
             Node& operator*() { return *n_; }
@@ -207,7 +209,13 @@ class btree {
 
             NodePtr() : n_(Const::null) {}
             NodePtr(Node* n) : n_(n) { ++n_->refCount; }
-            ~NodePtr() { if (!isNull() && --n_->refCount == 0) delete n_; }
+            ~NodePtr() { 
+                cout << "~NodePtr()" << endl;
+                if (!isNull() && --n_->refCount == 0) { 
+                    delete n_;
+                } 
+
+            }
             NodePtr(const NodePtr& rhs) : n_(rhs.n_) { if (!isNull()) ++n_->refCount; }
             NodePtr& operator=(const NodePtr& rhs) {
                 if (n_ == rhs.n_) 
@@ -230,7 +238,6 @@ class btree {
                 return os;
             }
 
-            private:
             bool isNull() { return n_ == Const::null; }
             Node* n_;
         };
@@ -240,12 +247,13 @@ class btree {
             //typedef deque<Node>                     nodes_type;
             typedef set<NodePtr>                    nodes_type;
             typedef typename nodes_type::iterator   nodes_iterator_type;
-            //typedef std::pair<iterator, bool>       insert_res_type;
            
-            BTree(size_t max) : maxNodeElems_(max) {
-                nodes_type nodes();
+            BTree(size_t max) : maxNodeElems_(max), refCount(0) { nodes_type nodes(); }
+            ~BTree() { 
+                cout << "~BTree()" << endl; 
             }
 
+            insert_res_type insert(const T& elem);
 
             NodePtr top_left_;
             NodePtr top_right_;
@@ -268,8 +276,14 @@ class btree {
             BTree& operator*() { return *btree_; }
             BTree& operator*() const { return *btree_; }
             
-            //BtreePtr() : tree_(Const::null) {}
-            ~BTreePtr() { if (btree_ != Const::null && --btree_->refCount == 0) delete btree_; }
+            BTreePtr() : btree_(Const::null) {}
+            ~BTreePtr() { 
+                if (!isNull()) cout << "~BtrPtr " << btree_->refCount << endl;
+                if (!isNull() && --btree_->refCount == 0) {
+                    //btree_->~BTree();
+                    delete btree_;
+                }  
+            }
 
             BTreePtr(const BTreePtr& rhs) : btree_(rhs.btree_) { ++btree_->refCount; }
             BTreePtr& operator=(const BTreePtr& rhs) {
@@ -283,6 +297,7 @@ class btree {
                 return *this;
             }
             
+            bool isNull() { return btree_ == Const::null; }
             BTree* btree_;
         };
 

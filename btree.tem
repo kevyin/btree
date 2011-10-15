@@ -18,44 +18,53 @@ std::ostream& operator<<(std::ostream& os, const btree<T>& btree) {
 }
 
 template <typename T>
-std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T& elem) {
-    NodePtr new_node(new Node(elem));
-
-    //if (nodeElems() < maxNodeElems_) { // no need for branching
-        ////btree_->nodes.insert(new_node);
-    //} else { // put the elem in a sub-btree
-
-        ////// find pos of subtree
-        ////nodes_iterator_type pos = nodes.lower_bound(new_node);
-        ////nodes_iterator_type top_right = pos;
-        ////nodes_iterator_type top_left = (top_right != nodes.begin()) ? --pos : pos;
-
-        ////cout << "INSERTING into new SUB TREE" << endl;
-        ////// The new sub-btree
-        ////btreePtr subbt(new btree<T>(maxNodeElems));
-        ////insert_res_type res = subbt->insert(elem);
-        //////cout << "new subtree " << *subtree << endl;
-
-
-        ////// modify the left right pointers in nodes above
-        ////if (top_right != nodes.end())  
-            ////(*top_right)->left_ = subbt; // top right node
-        
-        ////if (top_right != nodes.begin())  
-            ////(*top_left)->right_ = subbt; // top left node
-        
-        
-    //}
+typename btree<T>::insert_res_type btree<T>::insert(const T& elem) {
+    return btree_->insert(elem);
 }
 
 template <typename T>
 btree<T>::~btree() {
-    //cout << "~btree" << endl;
-    // Nodes will destroy their right branch therefore
-    // remember to destroy the first left most branch
-    //if (nodeElems() > 0) {
-        //btree* leftTree = nodes.begin()->left_;
-        //if (leftTree != Const::null) leftTree->~btree();
-    //}
+    cout << "~btree()" << endl;
+    btree_->nodes_.clear();
+    cout << "~btree() DONE" << endl;
 }
 
+// BTree functions
+
+template <typename T>
+typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
+    NodePtr new_node(new Node(elem));
+    if (nodeElems() < maxNodeElems_) { // no need for branching
+        //cout << "btr = before refcount " << refCount << endl;
+        //cout << "btreeinsert count" << refCount << endl;
+        new_node->owner_ = BTreePtr(this);
+        cout << "btreeinsert count" << refCount << endl;
+        //cout << "EWFFFFFF" << new_node->owner_->refCount << endl;
+        //cout << "btr = after refcount " << refCount << endl;
+        nodes_.insert(new_node);
+        cout << "btreeinsert count" << refCount << endl;
+    } else { // put the elem in a sub-btree
+
+        // find pos of subtree
+        //nodes_iterator_type pos = nodes_.lower_bound(new_node);
+        //nodes_iterator_type top_right = pos;
+        //nodes_iterator_type top_left = (top_right != nodes_.begin()) ? --pos : pos;
+
+        //cout << "INSERTING into new SUB TREE" << endl;
+        //// The new sub-btree
+        //btreePtr subbt(new btree<T>(maxNodeElems));
+        //insert_res_type res = subbt->insert(elem);
+        ////cout << "new subtree " << *subtree << endl;
+
+
+        //// modify the left right pointers in nodes above
+        //if (top_right != nodes.end())  
+            //(*top_right)->left_ = subbt; // top right node
+        
+        //if (top_right != nodes.begin())  
+            //(*top_left)->right_ = subbt; // top left node
+        
+        
+    }
+
+}
