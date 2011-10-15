@@ -175,7 +175,6 @@ class btree {
                                                    //left_(l), right_(r) {}
             //Node(const T& e, btree* l, btree* r) : elem_(e), left_(l), right_(r) {}
             ~Node() {
-                cout << "~Node()" << endl;
                 if (!left_.isNull()) left_->nodes_.clear();
                 if (!right_.isNull()) right_->nodes_.clear();
                 //if (left_ != Const::null) left_->~btree();
@@ -210,7 +209,6 @@ class btree {
             NodePtr() : n_(Const::null) {}
             NodePtr(Node* n) : n_(n) { ++n_->refCount; }
             ~NodePtr() { 
-                cout << "~NodePtr()" << endl;
                 if (!isNull() && --n_->refCount == 0) { 
                     delete n_;
                 } 
@@ -250,7 +248,6 @@ class btree {
            
             BTree(size_t max) : maxNodeElems_(max), refCount(0) { nodes_type nodes(); }
             ~BTree() { 
-                cout << "~BTree()" << endl; 
             }
 
             insert_res_type insert(const T& elem);
@@ -278,7 +275,6 @@ class btree {
             
             BTreePtr() : btree_(Const::null) {}
             ~BTreePtr() { 
-                if (!isNull()) cout << "~BtrPtr " << btree_->refCount << endl;
                 if (!isNull() && --btree_->refCount == 0) {
                     //btree_->~BTree();
                     delete btree_;

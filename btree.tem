@@ -24,9 +24,8 @@ typename btree<T>::insert_res_type btree<T>::insert(const T& elem) {
 
 template <typename T>
 btree<T>::~btree() {
-    cout << "~btree()" << endl;
+    // Clear the branches so that btree_ is the only BTreePtr left to the tree
     btree_->nodes_.clear();
-    cout << "~btree() DONE" << endl;
 }
 
 // BTree functions
@@ -35,14 +34,8 @@ template <typename T>
 typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
     NodePtr new_node(new Node(elem));
     if (nodeElems() < maxNodeElems_) { // no need for branching
-        //cout << "btr = before refcount " << refCount << endl;
-        //cout << "btreeinsert count" << refCount << endl;
         new_node->owner_ = BTreePtr(this);
-        cout << "btreeinsert count" << refCount << endl;
-        //cout << "EWFFFFFF" << new_node->owner_->refCount << endl;
-        //cout << "btr = after refcount " << refCount << endl;
         nodes_.insert(new_node);
-        cout << "btreeinsert count" << refCount << endl;
     } else { // put the elem in a sub-btree
 
         // find pos of subtree
