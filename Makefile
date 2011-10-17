@@ -26,7 +26,7 @@ all: $(OBJECTS)
 %: %.cpp btree.h btree.tem btree_iterator.h btree_iterator.tem
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
-testbtree: btree.h btree.tem testbtree.cpp
+testbtree: btree_iterator.h btree_iterator.tem btree.h btree.tem testbtree.cpp
 	$(CXX) $(CPPFLAGS) -DTEST -lboost_unit_test_framework -o testbtree btree.h testbtree.cpp
 
 clean: 
