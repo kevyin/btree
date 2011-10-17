@@ -273,7 +273,7 @@ class btree {
             /*
              * output the tree in bread-first order
              */
-            std::ostream& outputBF(vector<string>& strs, size_t level) const;
+            void outputBF(vector<string>& strs, size_t level) const;
             
         };
 

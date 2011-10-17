@@ -38,7 +38,7 @@ btree<T>::~btree() {
 
 template <typename T>
 typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
-    cout << "BTREE::INSERT " << elem << endl;
+    //cout << "BTREE::INSERT " << elem << endl;
     NodePtr new_node(new Node(elem));
     if (nodeElems() < maxNodeElems_) { // no need for branching
         new_node->owner_ = BTreePtr(this);
@@ -52,11 +52,11 @@ typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
 
         if ((top_right != nodes_.end() && (*top_right)->left_.isNull()) ||
             (top_right == nodes_.end() && (*top_left)->right_.isNull())) { 
-            cout << "INSERTING into new SUB TREE" << endl;
+            //cout << "INSERTING into new SUB TREE" << endl;
             // The new sub-btree
             BTreePtr subbt(new BTree(maxNodeElems_));
             insert_res_type res = subbt->insert(elem);
-            cout << "new subtree " << *subbt << endl;
+            //cout << "new subtree " << *subbt << endl;
             // modify the left right pointers in nodes above
             if (top_right != nodes_.end())  
                 (*top_right)->left_ = subbt; // top right node
@@ -65,17 +65,17 @@ typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
                 (*top_left)->right_ = subbt; // top left node
         } else if (top_right != nodes_.end()) {
             (*top_right)->left_->insert(elem);
-            cout << "old subtree " << *(*top_right)->left_ << endl;
+            //cout << "old subtree " << *(*top_right)->left_ << endl;
         } else {
             (*top_left)->right_->insert(elem);
-            cout << "old subtree " << *(*top_left)->right_<< endl;
+            //cout << "old subtree " << *(*top_left)->right_<< endl;
         }
     }
 }
 
 
 template <typename T>
-std::ostream& btree<T>::BTree::outputBF(vector<string>& strs, size_t level) const {
+void btree<T>::BTree::outputBF(vector<string>& strs, size_t level) const {
     // Add the nodes at this level
     ostringstream oss(ostringstream::in);
     for (nodes_iterator_type it = nodes_.begin(); it != nodes_.end(); ++it) {
