@@ -17,21 +17,21 @@ template <typename T> class btree;
 template <typename T>
 class btree_iterator {
     public:
-    typedef ptrdiff_t             difference_type;
-    typedef forward_iterator_tag  iterator_category;
-    typedef T                     value_type;
-    typedef T*                    pointer;
-    typedef T&                    reference;
+    typedef ptrdiff_t               difference_type;
+    typedef forward_iterator_tag    iterator_category;
+    typedef T                       value_type;
+    typedef T*                      pointer;
+    typedef T&                      reference;
 
     reference operator*() const;
-    pointer operator->() const { return &(operator*()); }
+    pointer operator->() const { return pointee_; }
     btree_iterator& operator++();
     bool operator==(const btree_iterator& other) const;
     bool operator!=(const btree_iterator& other) const { return !operator==(other); }
 
-    btree_iterator(typename btree<T>::NodePtr pointee) : pointee_(pointee) {}
+    btree_iterator(typename btree<T>::Node *pointee) : pointee_(pointee) {}
     private:
-    typename btree<T>::NodePtr *pointee_;
+    typename btree<T>::Node *pointee_;
 };
 
 #include "btree_iterator.tem"

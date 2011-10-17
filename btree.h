@@ -54,6 +54,7 @@ class btree {
          * @param maxNodeElems the maximum number of elements
          *        that can be stored in each B-Tree node
          */
+        //btree();
         btree(size_t maxNodeElems = 40);
 
         /**
@@ -97,7 +98,8 @@ class btree {
          * -- rend() 
          */
 
-        //iterator begin() { return iterator(head_) } 
+        //iterator begin() { return iterator(btree_->head()); } 
+        //iterator end() { return iterator(NodePtr()); } 
          
         /**
          * Returns an iterator to the matching element, or whatever 
@@ -237,7 +239,13 @@ class btree {
                 return os;
             }
 
-            bool isNull() { return n_ == Const::null; }
+            //bool operator==(const NodePtr& other) const {
+                //if (isNull() && other.isNull()) 
+                    //return true;
+                //return (n_== other.n_);
+            //}
+
+            bool isNull() const { return n_ == Const::null; }
             Node* n_;
         };
 
@@ -269,6 +277,11 @@ class btree {
                 }
                 return os;
             }
+
+            /*
+             * Return a NodePtr to the left-most node
+             */
+            //NodePtr head() const;
 
             /*
              * output the tree in bread-first order
@@ -305,13 +318,8 @@ class btree {
                 ++btree_->refCount;
                 return *this;
             }
-            bool operator==(BTreePtr& other) const {
-                if (this->isNull() && other.isNull()) 
-                    return true;
-                return (this->btree_ == other.btree_);
-            }
             
-            bool isNull() { return btree_ == Const::null; }
+            bool isNull() const { return btree_ == Const::null; }
             BTree* btree_;
         };
 
@@ -320,7 +328,7 @@ class btree {
         size_t maxNodeElems_;
         
         // private functions
-        bool isNull() { return btree_ == Const::null; }
+        bool isNull() const { return btree_ == Const::null; }
 
 };
 
