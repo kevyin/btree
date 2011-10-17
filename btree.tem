@@ -1,4 +1,7 @@
 #include <algorithm>
+#include <string>
+#include <vector>
+#include <sstream>
 
 template <typename T>
 btree<T>::btree(size_t maxNodeElems) : btree_(new BTree(maxNodeElems)), maxNodeElems_(maxNodeElems) {}
@@ -10,10 +13,12 @@ btree<T>::btree(const btree<T>& original) {
 
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const btree<T>& btree) {
-    for (typename ::btree<T>::BTree::nodes_type::const_iterator it = btree.btree_->nodes_.begin(); 
-         it != btree.btree_->nodes_.end(); ++it) {
-        os << *it;          
-    }
+    vector<string> strings;
+    btree.btree_->outputBF(strings, 1);
+
+    std::ostream_iterator< string > output( cout, " " );
+    copy(strings.begin(), strings.end(), output);
+    //os << *btree.btree_;
     return os;
 }
 
@@ -26,12 +31,14 @@ template <typename T>
 btree<T>::~btree() {
     // Clear the branches so that btree_ is the only BTreePtr left to the tree
     btree_->nodes_.clear();
+
 }
 
 // BTree functions
 
 template <typename T>
 typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
+    cout << "BTREE::INSERT " << elem << endl;
     NodePtr new_node(new Node(elem));
     if (nodeElems() < maxNodeElems_) { // no need for branching
         new_node->owner_ = BTreePtr(this);
@@ -43,7 +50,8 @@ typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
         nodes_iterator_type top_right = pos;
         nodes_iterator_type top_left = (top_right != nodes_.begin()) ? --pos : pos;
 
-        if ((*top_right)->left_.isNull() ) {
+        if ((top_right != nodes_.end() && (*top_right)->left_.isNull()) ||
+            (top_right == nodes_.end() && (*top_left)->right_.isNull())) { 
             cout << "INSERTING into new SUB TREE" << endl;
             // The new sub-btree
             BTreePtr subbt(new BTree(maxNodeElems_));
@@ -55,14 +63,39 @@ typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
             
             if (top_right != nodes_.begin())  
                 (*top_left)->right_ = subbt; // top left node
-        } else {
+        } else if (top_right != nodes_.end()) {
             (*top_right)->left_->insert(elem);
             cout << "old subtree " << *(*top_right)->left_ << endl;
+        } else {
+            (*top_left)->right_->insert(elem);
+            cout << "old subtree " << *(*top_left)->right_<< endl;
         }
+    }
+}
 
 
-        
-        
+template <typename T>
+std::ostream& btree<T>::BTree::outputBF(vector<string>& strs, size_t level) const {
+    // Add the nodes at this level
+    ostringstream oss(ostringstream::in);
+    for (nodes_iterator_type it = nodes_.begin(); it != nodes_.end(); ++it) {
+        if (it != nodes_.begin())
+            oss << ' ';
+        oss << *it;        
     }
 
+    if (strs.size() < level)
+        strs.push_back(oss.str());
+    else 
+        strs.at(level - 1) += ' ' + oss.str();
+    
+    // Add nodes to lower levels
+    if (!(*nodes_.begin())->left_.isNull()) {
+        (*nodes_.begin())->left_->outputBF(strs, level + 1);
+    }
+    for (nodes_iterator_type it = nodes_.begin(); it != nodes_.end(); ++it) {
+        if (!(*it)->right_.isNull()) {
+            (*it)->right_->outputBF(strs, level + 1);
+        }
+    }
 }

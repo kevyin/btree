@@ -17,7 +17,8 @@
 #include <iostream>
 #include <cstddef>
 #include <utility>
-#include <deque>
+//#include <deque>
+#include <vector>
 #include <set>
 
 namespace Const {
@@ -268,6 +269,11 @@ class btree {
                 }
                 return os;
             }
+
+            /*
+             * output the tree in bread-first order
+             */
+            std::ostream& outputBF(vector<string>& strs, size_t level) const;
             
         };
 
