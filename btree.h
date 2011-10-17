@@ -305,6 +305,11 @@ class btree {
                 ++btree_->refCount;
                 return *this;
             }
+            bool operator==(BTreePtr& other) const {
+                if (this->isNull() && other.isNull()) 
+                    return true;
+                return (this->btree_ == other.btree_);
+            }
             
             bool isNull() { return btree_ == Const::null; }
             BTree* btree_;
