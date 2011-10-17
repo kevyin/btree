@@ -12,8 +12,11 @@ using namespace std;
 // iterator related interface stuff here; would be nice if you called your
 // iterator class btree_iterator (and possibly const_btree_iterator)
 
+template <typename T> class btree;
+
 template <typename T>
 class btree_iterator {
+    public:
     typedef ptrdiff_t             difference_type;
     typedef forward_iterator_tag  iterator_category;
     typedef T                     value_type;
@@ -26,7 +29,9 @@ class btree_iterator {
     bool operator==(const btree_iterator& other) const;
     bool operator!=(const btree_iterator& other) const { return !operator==(other); }
 
-    //btree_iterator(typename 
+    btree_iterator(typename btree<T>::NodePtr pointee) : pointee_(pointee) {}
+    private:
+    typename btree<T>::NodePtr *pointee_;
 };
 
 #include "btree_iterator.tem"
