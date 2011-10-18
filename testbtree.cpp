@@ -91,6 +91,7 @@ BOOST_AUTO_TEST_CASE( test_iterator_inc ) {
     tree.insert('X');
     tree.insert('G');
     tree.insert('T');
+    tree.insert('A');
     
     for (btree<char>::iterator it = tree.begin(); it != tree.end(); ++it) {
         cout << " " << *it ;

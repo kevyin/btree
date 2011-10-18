@@ -18,7 +18,7 @@ btree_iterator<T>& btree_iterator<T>::operator++() {
         pointee_ = (*next_node).n_;
     else
         pointee_ = Const::null;
-    //pointee_ = 
+
     //if (!pointee_->right_.isNull()) { // check subtee on right
 
     //} else { // got up a level and get node from there
