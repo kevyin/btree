@@ -73,10 +73,10 @@ typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
     }
 }
 
-//template <typename T>
-//typename btree<T>::NodePtr btree<T>::BTree::head() const {
-    //return *nodes_.begin();
-//}
+template <typename T>
+typename btree<T>::Node* btree<T>::BTree::head() const {
+    return (*nodes_.begin()).n_;
+}
 
 template <typename T>
 void btree<T>::BTree::outputBF(vector<string>& strs, size_t level) const {

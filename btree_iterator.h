@@ -29,7 +29,7 @@ class btree_iterator {
     bool operator==(const btree_iterator& other) const;
     bool operator!=(const btree_iterator& other) const { return !operator==(other); }
 
-    btree_iterator(typename btree<T>::Node *pointee) : pointee_(pointee) {}
+    btree_iterator(typename btree<T>::Node *pointee = Const::null) : pointee_(pointee) {}
     private:
     typename btree<T>::Node *pointee_;
 };

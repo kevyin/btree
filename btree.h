@@ -98,8 +98,8 @@ class btree {
          * -- rend() 
          */
 
-        //iterator begin() { return iterator(btree_->head()); } 
-        //iterator end() { return iterator(NodePtr()); } 
+        iterator begin() { return iterator(btree_->head()); } 
+        iterator end() { return iterator(Const::null); } 
          
         /**
          * Returns an iterator to the matching element, or whatever 
@@ -180,10 +180,6 @@ class btree {
             ~Node() {
                 if (!left_.isNull()) left_->nodes_.clear();
                 if (!right_.isNull()) right_->nodes_.clear();
-                //if (left_ != Const::null) left_->~btree();
-                //delete left_;
-                //if (right_ != Const::null) right_->~btree();
-                //delete right_;
             }
 
             friend std::ostream& operator<<(std::ostream& os, const Node& n) {
@@ -281,7 +277,7 @@ class btree {
             /*
              * Return a NodePtr to the left-most node
              */
-            //NodePtr head() const;
+            Node* head() const;
 
             /*
              * output the tree in bread-first order

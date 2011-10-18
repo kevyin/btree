@@ -8,12 +8,22 @@ typename btree_iterator<T>::reference btree_iterator<T>::operator*() const {
 
 template <typename T>
 btree_iterator<T>& btree_iterator<T>::operator++() {
-    assert(!pointee_.isNull());
-    if (!pointee_->right_.isNull()) { // check subtee on right
+    assert(pointee_ != Const::null);
+    typename btree<T>::BTree::nodes_type& nodes = (*pointee_).owner_->nodes_;
 
-    } else { // got up a level and get node from there
+    typename btree<T>::NodePtr tmpNode(pointee_);
+    typename btree<T>::BTree::nodes_iterator_type next_node = nodes.upper_bound(tmpNode);
+
+    if (next_node != nodes.end())
+        pointee_ = (*next_node).n_;
+    else
+        pointee_ = Const::null;
+    //pointee_ = 
+    //if (!pointee_->right_.isNull()) { // check subtee on right
+
+    //} else { // got up a level and get node from there
    
-    }
+    //}
 
     return *this;
 }
