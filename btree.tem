@@ -33,6 +33,31 @@ btree<T>::~btree() {
     btree_->nodes_.clear();
 
 }
+// Node functions
+
+template <typename T>
+typename btree<T>::Node* btree<T>::Node::findNextUp() {
+        // look in owner nodes
+        typename btree<T>::BTree::nodes_type& nodes = owner_->nodes_;
+
+        typename btree<T>::NodePtr tmpNode(this);
+        typename btree<T>::BTree::nodes_iterator_type next_node = nodes.upper_bound(tmpNode);
+
+        if (next_node != nodes.end()) { // is there a next node
+            if ((*next_node)->left_.isNull()) { // if there is no tree on the left
+                return next_node->n_;
+            } else { 
+                // there is a tree on the left, return head()
+                return (*next_node)->left_->head();
+            }
+        } else { // otherwise go up again
+            if (!owner_->top_right_.isNull()) {
+                return owner_->top_right_.n_;
+            } else {
+                return Const::null;
+            }
+        }
+}
 
 // BTree functions
 
@@ -58,11 +83,15 @@ typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
             insert_res_type res = subbt->insert(elem);
             //cout << "new subtree " << *subbt << endl;
             // modify the left right pointers in nodes above
-            if (top_right != nodes_.end())  
+            if (top_right != nodes_.end()) {
                 (*top_right)->left_ = subbt; // top right node
+                subbt->top_right_ = *top_right;
+            }
             
-            if (top_right != nodes_.begin())  
+            if (top_right != nodes_.begin()) {
                 (*top_left)->right_ = subbt; // top left node
+                subbt->top_left_ = *top_left;
+            }
         } else if (top_right != nodes_.end()) {
             (*top_right)->left_->insert(elem);
             //cout << "old subtree " << *(*top_right)->left_ << endl;
@@ -109,3 +138,4 @@ void btree<T>::BTree::outputBF(vector<string>& strs, size_t level) const {
         }
     }
 }
+

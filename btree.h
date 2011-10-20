@@ -191,12 +191,18 @@ class btree {
                 return l.elem_ < r.elem_;
             }
 
+            /*
+             * Traverse up the tree and find the next node
+             */
+            Node* findNextUp(); 
+
+
             T       elem_;
             BTreePtr owner_; // the btree this node belongs to. 
             BTreePtr left_;
             BTreePtr right_;
 
-            int refCount;
+            mutable int refCount;
         };
 
         struct NodePtr {
@@ -255,16 +261,16 @@ class btree {
             ~BTree() { 
             }
 
-            insert_res_type insert(const T& elem);
-
+            // Members
             NodePtr top_left_;
             NodePtr top_right_;
-            mutable int refCount;
 
             nodes_type  nodes_;
             size_t      maxNodeElems_;
+            mutable int refCount;
 
             // Functions
+            insert_res_type insert(const T& elem);
             size_t nodeElems() { return nodes_.size(); }
             friend std::ostream& operator<<(std::ostream& os, const BTree& bt) {
                 for (typename nodes_type::const_iterator it = bt.nodes_.begin();
