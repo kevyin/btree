@@ -27,7 +27,7 @@ typename btree<T>::iterator btree<T>::find(const T& elem) {
 }
 
 template <typename T>
-typename btree<T>::insert_res_type btree<T>::insert(const T& elem) {
+std::pair<typename btree<T>::iterator, bool> btree<T>::insert(const T& elem) {
     return btree_->insert(elem);
 }
 
@@ -101,7 +101,7 @@ typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
         new_node->owner_ = BTreePtr(this);
         pair< typename btree<T>::BTree::nodes_type::iterator, bool> res = nodes_.insert(new_node);
 
-        return btree<T>::insert_res_type(btree_iterator<T>(new_node.n_), res.second);
+        return typename btree<T>::insert_res_type(btree_iterator<T>(new_node.n_), res.second);
     } else { // put the elem in a sub-btree
         // find pos of subtree to insert
         nodes_iterator_type pos = nodes_.lower_bound(new_node);
