@@ -179,8 +179,6 @@ class btree {
             //Node(const T& e, btree* l, btree* r) : elem_(e), left_(l), right_(r) {}
             ~Node() {
                 cout << "Node" << endl;
-                if (!left_.isNull()) left_->clear();
-                if (!right_.isNull()) right_->clear();
                 clear();
             }
 
@@ -206,6 +204,13 @@ class btree {
                 owner_ = BTreePtr();    
                 left_ = BTreePtr();    
                 right_ = BTreePtr();    
+            }
+
+            void recurClear() {
+                cout << "Node recurclear" << endl;
+                if (!left_.isNull()) left_->recurClear();
+                if (!right_.isNull()) right_->recurClear();
+                clear();
             }
 
 
@@ -276,7 +281,7 @@ class btree {
                 //for (nodes_iterator_type it = nodes_.begin(); it != nodes_.end(); ++it) {
                     //(*it)->clear();
                 //}
-                clear();
+                recurClear();
             }
 
             // Members
@@ -315,6 +320,13 @@ class btree {
                 //top_left_ = NodePtr();
                 //top_right_ = NodePtr();
                 nodes_.clear();
+            }
+
+            void recurClear() {
+                for (nodes_iterator_type it = nodes_.begin(); it != nodes_.end(); ++it) {
+                    (*it)->recurClear();
+                }
+                clear();
             }
             
         };
