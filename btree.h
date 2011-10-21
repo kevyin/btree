@@ -178,7 +178,6 @@ class btree {
                                                    //left_(l), right_(r) {}
             //Node(const T& e, btree* l, btree* r) : elem_(e), left_(l), right_(r) {}
             ~Node() {
-                cout << "Node" << endl;
                 clear();
             }
 
@@ -200,14 +199,12 @@ class btree {
              * clear this node's references to other objects
              */
             void clear() {
-                cout << "Node clear" << endl;
                 owner_ = BTreePtr();    
                 left_ = BTreePtr();    
                 right_ = BTreePtr();    
             }
 
             void recurClear() {
-                cout << "Node recurclear" << endl;
                 if (!left_.isNull()) left_->recurClear();
                 if (!right_.isNull()) right_->recurClear();
                 clear();
@@ -231,7 +228,6 @@ class btree {
             NodePtr() : n_(Const::null) {}
             NodePtr(Node* n) : n_(n) { ++n_->refCount; }
             ~NodePtr() { 
-                cout << "NodePtr" << endl;
                 if (!isNull() && --n_->refCount == 0) { 
                     delete n_;
                 } 
@@ -277,7 +273,6 @@ class btree {
            
             BTree(size_t max) : maxNodeElems_(max), refCount(0) { nodes_type nodes(); }
             ~BTree() { 
-                cout << "Btree" << endl;
                 //for (nodes_iterator_type it = nodes_.begin(); it != nodes_.end(); ++it) {
                     //(*it)->clear();
                 //}
@@ -342,7 +337,6 @@ class btree {
             
             BTreePtr() : btree_(Const::null) {}
             ~BTreePtr() { 
-                cout << "~BTree" << endl;
                 if (!isNull() && --btree_->refCount == 0) {
                     //btree_->~BTree();
                     delete btree_;
@@ -351,21 +345,15 @@ class btree {
 
             BTreePtr(const BTreePtr& rhs) : btree_(rhs.btree_) { ++btree_->refCount; }
             BTreePtr& operator=(const BTreePtr& rhs) {
-                cout << "Btree =" << endl;
                 if (!isNull() && btree_ == rhs.btree_)  {
-                cout << "1=" << endl;
                     return *this;
                 }
                 if (btree_ != Const::null && --btree_->refCount == 0) {
-                cout << "2=" << endl;
                     delete btree_;
                 }
 
-                cout << "3=" << endl;
                 btree_ = rhs.btree_;
-                cout << "4=" << endl;
                 if (!isNull() ) ++btree_->refCount;
-                cout << "4=" << endl;
                 return *this;
             }
             
