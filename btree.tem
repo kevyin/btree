@@ -30,7 +30,7 @@ typename btree<T>::insert_res_type btree<T>::insert(const T& elem) {
 template <typename T>
 btree<T>::~btree() {
     // Clear the branches so that btree_ is the only BTreePtr left to the tree
-    btree_->nodes_.clear();
+    btree_->clear();
 
 }
 // Node functions
@@ -67,21 +67,21 @@ typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
     NodePtr new_node(new Node(elem));
     if (nodeElems() < maxNodeElems_) { // no need for branching
         new_node->owner_ = BTreePtr(this);
-        nodes_.insert(new_node);
-    } else { // put the elem in a sub-btree
+        pair< typename btree<T>::BTree::nodes_type::iterator, bool> res = nodes_.insert(new_node);
 
-        // find pos of subtree
+        return btree<T>::insert_res_type(btree_iterator<T>(new_node.n_), res.second);
+    } else { // put the elem in a sub-btree
+        // find pos of subtree to insert
         nodes_iterator_type pos = nodes_.lower_bound(new_node);
         nodes_iterator_type top_right = pos;
         nodes_iterator_type top_left = (top_right != nodes_.begin()) ? --pos : pos;
 
         if ((top_right != nodes_.end() && (*top_right)->left_.isNull()) ||
             (top_right == nodes_.end() && (*top_left)->right_.isNull())) { 
-            //cout << "INSERTING into new SUB TREE" << endl;
             // The new sub-btree
             BTreePtr subbt(new BTree(maxNodeElems_));
             insert_res_type res = subbt->insert(elem);
-            //cout << "new subtree " << *subbt << endl;
+
             // modify the left right pointers in nodes above
             if (top_right != nodes_.end()) {
                 (*top_right)->left_ = subbt; // top right node
@@ -92,12 +92,13 @@ typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
                 (*top_left)->right_ = subbt; // top left node
                 subbt->top_left_ = *top_left;
             }
-        } else if (top_right != nodes_.end()) {
-            (*top_right)->left_->insert(elem);
-            //cout << "old subtree " << *(*top_right)->left_ << endl;
+            return res;
+        } else if (top_right != nodes_.end()) { 
+            // put in already existing subtree
+            return (*top_right)->left_->insert(elem);
         } else {
-            (*top_left)->right_->insert(elem);
-            //cout << "old subtree " << *(*top_left)->right_<< endl;
+            // put in already existing subtree
+            return (*top_left)->right_->insert(elem);
         }
     }
 }

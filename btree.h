@@ -178,8 +178,10 @@ class btree {
                                                    //left_(l), right_(r) {}
             //Node(const T& e, btree* l, btree* r) : elem_(e), left_(l), right_(r) {}
             ~Node() {
-                if (!left_.isNull()) left_->nodes_.clear();
-                if (!right_.isNull()) right_->nodes_.clear();
+                cout << "Node" << endl;
+                if (!left_.isNull()) left_->clear();
+                if (!right_.isNull()) right_->clear();
+                clear();
             }
 
             friend std::ostream& operator<<(std::ostream& os, const Node& n) {
@@ -195,6 +197,16 @@ class btree {
              * Traverse up the tree and find the next node
              */
             Node* findNextUp(); 
+
+            /*
+             * clear this node's references to other objects
+             */
+            void clear() {
+                cout << "Node clear" << endl;
+                owner_ = BTreePtr();    
+                left_ = BTreePtr();    
+                right_ = BTreePtr();    
+            }
 
 
             T       elem_;
@@ -214,6 +226,7 @@ class btree {
             NodePtr() : n_(Const::null) {}
             NodePtr(Node* n) : n_(n) { ++n_->refCount; }
             ~NodePtr() { 
+                cout << "NodePtr" << endl;
                 if (!isNull() && --n_->refCount == 0) { 
                     delete n_;
                 } 
@@ -259,6 +272,11 @@ class btree {
            
             BTree(size_t max) : maxNodeElems_(max), refCount(0) { nodes_type nodes(); }
             ~BTree() { 
+                cout << "Btree" << endl;
+                //for (nodes_iterator_type it = nodes_.begin(); it != nodes_.end(); ++it) {
+                    //(*it)->clear();
+                //}
+                clear();
             }
 
             // Members
@@ -289,6 +307,15 @@ class btree {
              * output the tree in bread-first order
              */
             void outputBF(vector<string>& strs, size_t level) const;
+
+            /*
+             * clear nodes references to other objects
+             */
+            void clear() {
+                //top_left_ = NodePtr();
+                //top_right_ = NodePtr();
+                nodes_.clear();
+            }
             
         };
 
@@ -303,6 +330,7 @@ class btree {
             
             BTreePtr() : btree_(Const::null) {}
             ~BTreePtr() { 
+                cout << "~BTree" << endl;
                 if (!isNull() && --btree_->refCount == 0) {
                     //btree_->~BTree();
                     delete btree_;
@@ -311,13 +339,21 @@ class btree {
 
             BTreePtr(const BTreePtr& rhs) : btree_(rhs.btree_) { ++btree_->refCount; }
             BTreePtr& operator=(const BTreePtr& rhs) {
-                if (btree_ == rhs.btree_) 
+                cout << "Btree =" << endl;
+                if (!isNull() && btree_ == rhs.btree_)  {
+                cout << "1=" << endl;
                     return *this;
-                if (btree_ != Const::null && --btree_->refCount == 0)
+                }
+                if (btree_ != Const::null && --btree_->refCount == 0) {
+                cout << "2=" << endl;
                     delete btree_;
+                }
 
+                cout << "3=" << endl;
                 btree_ = rhs.btree_;
-                ++btree_->refCount;
+                cout << "4=" << endl;
+                if (!isNull() ) ++btree_->refCount;
+                cout << "4=" << endl;
                 return *this;
             }
             
