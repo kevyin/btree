@@ -18,7 +18,6 @@ std::ostream& operator<<(std::ostream& os, const btree<T>& btree) {
 
     std::ostream_iterator< string > output( cout, " " );
     copy(strings.begin(), strings.end(), output);
-    //os << *btree.btree_;
     return os;
 }
 
@@ -97,7 +96,6 @@ typename btree<T>::Node* btree<T>::Node::findPrevUp() {
 
 template <typename T>
 typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
-    //cout << "BTREE::INSERT " << elem << endl;
     NodePtr new_node(new Node(elem));
     if (nodeElems() < maxNodeElems_) { // no need for branching
         new_node->owner_ = BTreePtr(this);

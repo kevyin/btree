@@ -38,8 +38,9 @@ class btree {
     public:
         /** Hmm, need some iterator typedefs here... friends? **/
         friend class btree_iterator<T>;
-        //friend class btree_reverse_iterator<T>;
-        typedef btree_iterator<T> iterator;
+        friend class btree_const_iterator<T>;
+
+        typedef btree_iterator<T>       iterator;
         typedef btree_const_iterator<T> const_iterator;
 
         typedef btree_reverse_iterator<const_iterator>  const_reverse_iterator;
@@ -98,9 +99,9 @@ class btree {
         friend std::ostream& operator<< <T> (std::ostream& os, const btree<T>& tree);
 
         iterator begin() { return iterator(btree_->head(), this->btree_); } 
-        const_iterator begin() const { return iterator(btree_->head(), this->btree_); } 
+        const_iterator begin() const { return const_iterator(btree_->head(), this->btree_); } 
         iterator end() { return iterator(Const::null, this->btree_); } 
-        const_iterator end() const { return iterator(Const::null, this->btree_); } 
+        const_iterator end() const { return const_iterator(Const::null, this->btree_); } 
 
         reverse_iterator rbegin() { return reverse_iterator(end()); }
         const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
@@ -132,7 +133,7 @@ class btree {
          * @return an iterator to the matching element, or whatever the
          *         const end() returns if no such match was ever found.
          */
-        //const_iterator find(const T& elem) const;
+        const_iterator find(const T& elem) const { return find(elem); };
 
         /**
          * Operation which inserts the specified element
@@ -180,9 +181,7 @@ class btree {
         struct Node {
             public:
             Node(const T& e) : elem_(e) { refCount = 0; }
-            //Node(const T& e, BtreePtr l, BtreePtr r) : elem_(e), refCount(0), 
-                                                   //left_(l), right_(r) {}
-            //Node(const T& e, btree* l, btree* r) : elem_(e), left_(l), right_(r) {}
+
             ~Node() {
                 clear();
             }
@@ -266,25 +265,17 @@ class btree {
                 return os;
             }
 
-            //bool operator==(const NodePtr& other) const {
-                //return (n_== other.n_);
-            //}
-
             bool isNull() const { return n_ == Const::null; }
             Node* n_;
         };
 
         struct BTree {
             // Types
-            //typedef deque<Node>                     nodes_type;
             typedef set<NodePtr>                    nodes_type;
             typedef typename nodes_type::iterator   nodes_iterator_type;
            
             BTree(size_t max) : maxNodeElems_(max), refCount(0) { nodes_type nodes(); }
             ~BTree() { 
-                //for (nodes_iterator_type it = nodes_.begin(); it != nodes_.end(); ++it) {
-                    //(*it)->clear();
-                //}
                 recurClear();
             }
 
@@ -346,8 +337,6 @@ class btree {
              * clear nodes references to other objects
              */
             void clear() {
-                //top_left_ = NodePtr();
-                //top_right_ = NodePtr();
                 nodes_.clear();
             }
 
