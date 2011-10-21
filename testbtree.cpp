@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE( test_insert_char ) {
 } 
 
 BOOST_AUTO_TEST_CASE( test_iterator_inc_dec ) {
-    cout << "BOOST TEST: iterator ++, begin end" << endl;
+    cout << "BOOST TEST: iterator ++, begin end rev" << endl;
 
     btree<char> tree(4);
     BOOST_CHECK_EQUAL(tree.maxNodeElems_, 4);
@@ -113,16 +113,26 @@ BOOST_AUTO_TEST_CASE( test_iterator_inc_dec ) {
     }
 
     cout << endl;
-    //it = tree.end();
-    //--it;
-    //cout << " " << *it ;
-    //--it;
-    //cout << " " << *it ;
     for (it = --tree.end(); it != tree.begin(); --it) {
         cout << " "; 
         cout << *it ;
     }
         cout << *it ;
+    cout << endl;
+
+
+    btree<char>::reverse_iterator rit;
+    for (rit = tree.rbegin(); rit != tree.rend(); ++rit) {
+        cout << " " << *rit ;
+    }
+
+    cout << endl;
+
+    for (rit = --tree.rend(); rit != tree.rbegin(); --rit) {
+        cout << " "; 
+        cout << *rit ;
+    }
+        cout << *rit ;
     cout << endl;
 
 }

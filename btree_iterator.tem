@@ -27,3 +27,28 @@ btree_iterator<T>& btree_iterator<T>::operator--() {
     return *this;
 }
 
+template <typename T>
+btree_reverse_iterator<T>& btree_reverse_iterator<T>::operator++() {
+    assert(pointee_ != Const::null);
+
+    if (!pointee_->left_.isNull()) { // check subtee on right
+        pointee_ = pointee_->left_->tail();
+    } else { // go up 
+        pointee_ = pointee_->findPrevUp();
+    }
+
+    return *this;
+}
+
+template <typename T>
+btree_reverse_iterator<T>& btree_reverse_iterator<T>::operator--() {
+    if (pointee_ == Const::null) {
+        pointee_ = this->btree_->head();
+    } else if (!pointee_->right_.isNull()) { // check subtee on left
+        pointee_ = pointee_->right_->head();
+    } else { // go up 
+        pointee_ = pointee_->findNextUp();
+    }
+
+    return *this;
+}
