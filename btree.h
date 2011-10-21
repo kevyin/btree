@@ -38,11 +38,15 @@ class btree {
     public:
         /** Hmm, need some iterator typedefs here... friends? **/
         friend class btree_iterator<T>;
-        friend class btree_reverse_iterator<T>;
+        //friend class btree_reverse_iterator<T>;
         typedef btree_iterator<T> iterator;
-        //typedef btree_iterator<T> const_iterator;
-        typedef btree_reverse_iterator<T> reverse_iterator;
-        //typedef btree_reverse_iterator<T> const_reverse_iterator;
+        typedef btree_const_iterator<T> const_iterator;
+
+        typedef btree_reverse_iterator<const_iterator>  const_reverse_iterator;
+        typedef btree_reverse_iterator<iterator>        reverse_iterator;
+
+
+
 
         /**
          * Constructs an empty btree.  Note that
@@ -93,16 +97,15 @@ class btree {
          */
         friend std::ostream& operator<< <T> (std::ostream& os, const btree<T>& tree);
 
-        /**
-         * The following can go here
-         * -- rbegin() 
-         * -- rend() 
-         */
+        iterator begin() { return iterator(btree_->head(), this->btree_); } 
+        const_iterator begin() const { return iterator(btree_->head(), this->btree_); } 
+        iterator end() { return iterator(Const::null, this->btree_); } 
+        const_iterator end() const { return iterator(Const::null, this->btree_); } 
 
-        reverse_iterator rbegin() const { return reverse_iterator(btree_->tail(), this->btree_); } 
-        reverse_iterator rend() const { return reverse_iterator(Const::null, this->btree_); } 
-        iterator begin() const { return iterator(btree_->head(), this->btree_); } 
-        iterator end() const { return iterator(Const::null, this->btree_); } 
+        reverse_iterator rbegin() { return reverse_iterator(end()); }
+        const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
+        reverse_iterator rend() { return reverse_iterator(begin()); }
+        const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
          
         /**
          * Returns an iterator to the matching element, or whatever 

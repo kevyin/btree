@@ -120,6 +120,19 @@ BOOST_AUTO_TEST_CASE( test_iterator_inc_dec ) {
         cout << *it ;
     cout << endl;
 
+    btree<char>::const_iterator cit;
+    for (cit = tree.begin(); cit != tree.end(); ++cit) {
+        cout << " " << *cit ;
+    }
+
+    cout << endl;
+    for (cit = --tree.end(); cit != tree.begin(); --cit) {
+        cout << " "; 
+        cout << *cit ;
+    }
+        cout << *cit ;
+    cout << endl;
+
 
     btree<char>::reverse_iterator rit;
     for (rit = tree.rbegin(); rit != tree.rend(); ++rit) {
