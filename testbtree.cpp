@@ -110,3 +110,33 @@ BOOST_AUTO_TEST_CASE( test_iterator_inc ) {
     cout << endl;
 
 }
+
+BOOST_AUTO_TEST_CASE( test_find ) {
+    cout << "BOOST TEST: find" << endl;
+    btree<char> tree(4);
+    BOOST_CHECK_EQUAL(tree.maxNodeElems_, 4);
+    BOOST_CHECK_EQUAL(tree.btree_->nodeElems(), 0);
+
+    tree.insert('M');
+
+    tree.insert('P');
+    tree.insert('X');
+    tree.insert('G');
+    tree.insert('T');
+    tree.insert('A');
+    tree.insert('B');
+
+    cout << tree << endl;
+
+    btree<char>::iterator it;
+    for (it = tree.begin(); it != tree.end(); ++it) {
+        btree<char>::iterator found = tree.find(*it);
+        BOOST_CHECK_EQUAL(*found, *it);
+    }
+
+    it = tree.find('Z');
+    BOOST_CHECK(it == tree.end());
+
+    it = tree.find('C');
+    BOOST_CHECK(it == tree.end());
+}

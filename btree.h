@@ -98,8 +98,8 @@ class btree {
          * -- rend() 
          */
 
-        iterator begin() { return iterator(btree_->head()); } 
-        iterator end() { return iterator(Const::null); } 
+        iterator begin() const { return iterator(btree_->head()); } 
+        iterator end() const { return iterator(Const::null); } 
          
         /**
          * Returns an iterator to the matching element, or whatever 
@@ -256,8 +256,6 @@ class btree {
             }
 
             //bool operator==(const NodePtr& other) const {
-                //if (isNull() && other.isNull()) 
-                    //return true;
                 //return (n_== other.n_);
             //}
 
@@ -296,6 +294,26 @@ class btree {
                     os << *it;
                 }
                 return os;
+            }
+
+            Node* find(const T& elem) const {
+                NodePtr tmp_node(new Node(elem));
+
+                nodes_iterator_type res = nodes_.lower_bound(tmp_node);
+                // check this level
+                if (res != nodes_.end() && (*res)->elem_ == elem) {
+                    return (*res).n_;
+                }
+                // check lower levels
+                if (res != nodes_.end()) {
+                    if (!(*res)->left_.isNull())
+                        return (*res)->left_->find(elem);
+                } else {
+                    --res;
+                    if (!(*res)->right_.isNull())
+                        return (*res)->right_->find(elem);
+                }
+                return Const::null;
             }
 
             /*
@@ -338,7 +356,6 @@ class btree {
             BTreePtr() : btree_(Const::null) {}
             ~BTreePtr() { 
                 if (!isNull() && --btree_->refCount == 0) {
-                    //btree_->~BTree();
                     delete btree_;
                 }  
             }

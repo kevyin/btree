@@ -23,6 +23,11 @@ std::ostream& operator<<(std::ostream& os, const btree<T>& btree) {
 }
 
 template <typename T>
+typename btree<T>::iterator btree<T>::find(const T& elem) {
+    return iterator(btree_->find(elem));
+}
+
+template <typename T>
 typename btree<T>::insert_res_type btree<T>::insert(const T& elem) {
     return btree_->insert(elem);
 }
