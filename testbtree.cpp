@@ -11,9 +11,9 @@ using namespace std;
 BOOST_AUTO_TEST_CASE( constructors ) {
     cout << "BOOST TEST: Constructors" << endl;
 
-    btree<int> treenoarg();
-    btree<int> tree(4);
-    BOOST_CHECK_EQUAL(tree.maxNodeElems_, 4);
+    btree<long> treenoarg();
+    btree<long> tree(99);
+    BOOST_CHECK_EQUAL(tree.maxNodeElems_, 99);
     //BOOST_CHECK_EQUAL(tree.nodeElems(), 0);
     cout << "finished Constructors" << endl;
 } 
@@ -21,8 +21,8 @@ BOOST_AUTO_TEST_CASE( constructors ) {
 BOOST_AUTO_TEST_CASE( test_insert_int ) {
     cout << "BOOST TEST: insert int" << endl;
 
-    btree<int> tree(4);
-    BOOST_CHECK_EQUAL(tree.maxNodeElems_, 4);
+    btree<long> tree(99);
+    BOOST_CHECK_EQUAL(tree.maxNodeElems_, 99);
     BOOST_CHECK_EQUAL(tree.btree_->nodeElems(), 0);
 
     tree.insert(2);
@@ -164,6 +164,8 @@ BOOST_AUTO_TEST_CASE( test_find ) {
     tree.insert('T');
     tree.insert('A');
     tree.insert('B');
+    tree.insert('A');
+    tree.insert('A');
 
     cout << tree << endl;
 

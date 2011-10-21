@@ -120,9 +120,10 @@ int main(void) {
   btree<long> testContainer(99);
   set<long> stableContainer;
     
-  insertRandomNumbers(testContainer, stableContainer, 1000000);
+  insertRandomNumbers(testContainer, stableContainer, 1000);
   btree<long> btcpy = testContainer;
   confirmEverythingMatches(btcpy, stableContainer);
+  //confirmEverythingMatches(testContainer, stableContainer);
 
 /***
   

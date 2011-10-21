@@ -85,7 +85,7 @@ class btree {
          *
          * @param rhs a const reference to a B-Tree object
          */
-        btree<T>& operator=(const btree<T>& rhs);
+        btree<T>& operator=(const btree<T>& rhs) { return btree<T>(rhs); }
 
         /**
          * Puts a breadth-first traversal of the B-Tree onto the output
@@ -133,7 +133,7 @@ class btree {
          * @return an iterator to the matching element, or whatever the
          *         const end() returns if no such match was ever found.
          */
-        const_iterator find(const T& elem) const { return find(elem); };
+        const_iterator find(const T& elem) const;
 
         /**
          * Operation which inserts the specified element
@@ -301,6 +301,7 @@ class btree {
             Node* find(const T& elem) const {
                 NodePtr tmp_node(new Node(elem));
 
+                //cout << " nodes size " << nodes_.size() << endl;
                 nodes_iterator_type res = nodes_.lower_bound(tmp_node);
                 // check this level
                 if (res != nodes_.end() && (*res)->elem_ == elem) {
