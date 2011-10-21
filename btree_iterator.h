@@ -31,8 +31,12 @@ class btree_iterator {
     bool operator!=(const btree_iterator& other) const { return !operator==(other); }
 
     btree_iterator(typename btree<T>::Node *pointee = Const::null) : pointee_(pointee) {}
+    btree_iterator(typename btree<T>::Node *pointee, 
+                   const typename btree<T>::BTreePtr& btptr) : pointee_(pointee),
+                                                        btree_(btptr.btree_) {}
     private:
     typename btree<T>::Node *pointee_;
+    const typename btree<T>::BTree* btree_;
 };
 
 template <typename T>

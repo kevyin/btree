@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE( test_insert_char ) {
     cout << "finished test insert char" << endl;
 } 
 
-BOOST_AUTO_TEST_CASE( test_iterator_inc ) {
+BOOST_AUTO_TEST_CASE( test_iterator_inc_dec ) {
     cout << "BOOST TEST: iterator ++, begin end" << endl;
 
     btree<char> tree(4);
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE( test_iterator_inc ) {
     tree.insert('M');
 
     tree.insert('P');
-    tree.insert('X');
+    tree.insert('Y');
     tree.insert('G');
     tree.insert('T');
     tree.insert('A');
@@ -102,12 +102,27 @@ BOOST_AUTO_TEST_CASE( test_iterator_inc ) {
     tree.insert('Q');
     tree.insert('V');
     tree.insert('A');
+    tree.insert('O');
+    tree.insert('X');
 
     cout << tree << endl;
-    
-    for (btree<char>::iterator it = tree.begin(); it != tree.end(); ++it) {
+
+    btree<char>::iterator it;
+    for (it = tree.begin(); it != tree.end(); ++it) {
         cout << " " << *it ;
     }
+
+    cout << endl;
+    //it = tree.end();
+    //--it;
+    //cout << " " << *it ;
+    //--it;
+    //cout << " " << *it ;
+    for (it = --tree.end(); it != tree.begin(); --it) {
+        cout << " "; 
+        cout << *it ;
+    }
+        cout << *it ;
     cout << endl;
 
 }

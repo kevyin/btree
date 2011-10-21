@@ -99,10 +99,10 @@ class btree {
          * -- rend() 
          */
 
-        iterator rbegin() const { return reverse_iterator(btree_->tail()); } 
-        iterator rend() const { return reverse_iterator(Const::null); } 
-        iterator begin() const { return iterator(btree_->head()); } 
-        iterator end() const { return iterator(Const::null); } 
+        iterator rbegin() const { return reverse_iterator(btree_->tail(), this->btree_); } 
+        iterator rend() const { return reverse_iterator(Const::null, this->btree_); } 
+        iterator begin() const { return iterator(btree_->head(), this->btree_); } 
+        iterator end() const { return iterator(Const::null, this->btree_); } 
          
         /**
          * Returns an iterator to the matching element, or whatever 
