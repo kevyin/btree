@@ -23,13 +23,35 @@ class btree_iterator {
     typedef T*                      pointer;
     typedef T&                      reference;
 
-    reference operator*() const;
+    reference operator*() const { return pointee_->elem_; }
     pointer operator->() const { return pointee_; }
     btree_iterator& operator++();
-    bool operator==(const btree_iterator& other) const;
+    btree_iterator& operator--();
+    bool operator==(const btree_iterator& other) const { return this->pointee_ == other.pointee_; } 
     bool operator!=(const btree_iterator& other) const { return !operator==(other); }
 
     btree_iterator(typename btree<T>::Node *pointee = Const::null) : pointee_(pointee) {}
+    private:
+    typename btree<T>::Node *pointee_;
+};
+
+template <typename T>
+class btree_reverse_iterator {
+    public:
+    typedef ptrdiff_t               difference_type;
+    typedef forward_iterator_tag    iterator_category;
+    typedef T                       value_type;
+    typedef T*                      pointer;
+    typedef T&                      reference;
+
+    reference operator*() const { return pointee_->elem_; }
+    pointer operator->() const { return pointee_; }
+    btree_reverse_iterator& operator++();
+    btree_reverse_iterator& operator--();
+    bool operator==(const btree_reverse_iterator& other) const { return this->pointee_ == other.pointee_; }
+    bool operator!=(const btree_reverse_iterator& other) const { return !operator==(other); }
+
+    btree_reverse_iterator(typename btree<T>::Node *pointee = Const::null) : pointee_(pointee) {}
     private:
     typename btree<T>::Node *pointee_;
 };

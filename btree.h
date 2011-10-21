@@ -40,6 +40,8 @@ class btree {
         friend class btree_iterator<T>;
         typedef btree_iterator<T> iterator;
         //typedef btree_iterator<T> const_iterator;
+        typedef btree_reverse_iterator<T> reverse_iterator;
+        //typedef btree_reverse_iterator<T> const_reverse_iterator;
 
         /**
          * Constructs an empty btree.  Note that
@@ -54,7 +56,6 @@ class btree {
          * @param maxNodeElems the maximum number of elements
          *        that can be stored in each B-Tree node
          */
-        //btree();
         btree(size_t maxNodeElems = 40);
 
         /**
@@ -93,11 +94,12 @@ class btree {
 
         /**
          * The following can go here
-         * -- end() 
          * -- rbegin() 
          * -- rend() 
          */
 
+        iterator rbegin() const { return reverse_iterator(btree_->tail()); } 
+        iterator rend() const { return reverse_iterator(Const::null); } 
         iterator begin() const { return iterator(btree_->head()); } 
         iterator end() const { return iterator(Const::null); } 
          
@@ -194,6 +196,11 @@ class btree {
              * Traverse up the tree and find the next node
              */
             Node* findNextUp(); 
+
+            /*
+             * Traverse up the tree and find the previous node
+             */
+            Node* findPrevUp(); 
 
             /*
              * clear this node's references to other objects
@@ -320,6 +327,11 @@ class btree {
              * Return a NodePtr to the left-most node
              */
             Node* head() const;
+                      
+            /*
+             * Return a NodePtr to the right-most node
+             */       
+            Node* tail() const;
 
             /*
              * output the tree in bread-first order

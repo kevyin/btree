@@ -11,6 +11,7 @@ using namespace std;
 BOOST_AUTO_TEST_CASE( constructors ) {
     cout << "BOOST TEST: Constructors" << endl;
 
+    btree<int> treenoarg();
     btree<int> tree(4);
     BOOST_CHECK_EQUAL(tree.maxNodeElems_, 4);
     //BOOST_CHECK_EQUAL(tree.nodeElems(), 0);

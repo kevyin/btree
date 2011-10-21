@@ -64,6 +64,31 @@ typename btree<T>::Node* btree<T>::Node::findNextUp() {
     }
 }
 
+template <typename T>
+typename btree<T>::Node* btree<T>::Node::findPrevUp() {
+    // look in owner nodes
+    typename btree<T>::BTree::nodes_type& nodes = owner_->nodes_;
+
+    typename btree<T>::NodePtr tmpNode(this);
+    typename btree<T>::BTree::nodes_iterator_type next_node = nodes.lower_bound(tmpNode);
+
+    if (next_node != nodes.begin()) { // is there a next node
+        --next_node; // because lower_bound gives first ele not < 
+        if ((*next_node)->right_.isNull()) { // if there is no tree on the right
+            return next_node->n_;
+        } else { 
+            // there is a tree on the right, return tail()
+            return (*next_node)->right_->tail();
+        }
+    } else { // otherwise go up again
+        if (!owner_->top_left_.isNull()) {
+            return owner_->top_left_.n_;
+        } else {
+            return Const::null;
+        }
+    }
+}
+
 // BTree functions
 
 template <typename T>
@@ -116,7 +141,16 @@ typename btree<T>::Node* btree<T>::BTree::head() const {
     } else {
         return firstNode.left_->head();
     }
-    
+}
+
+template <typename T>
+typename btree<T>::Node* btree<T>::BTree::tail() const {
+    typename btree<T>::Node& firstNode = **nodes_.rbegin();
+    if (firstNode.right_.isNull()) {
+        return &firstNode;
+    } else {
+        return firstNode.right_->tail();
+    }
 }
 
 template <typename T>
