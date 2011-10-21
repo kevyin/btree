@@ -38,6 +38,7 @@ class btree {
     public:
         /** Hmm, need some iterator typedefs here... friends? **/
         friend class btree_iterator<T>;
+        friend class btree_reverse_iterator<T>;
         typedef btree_iterator<T> iterator;
         //typedef btree_iterator<T> const_iterator;
         typedef btree_reverse_iterator<T> reverse_iterator;
