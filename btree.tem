@@ -3,13 +3,13 @@
 #include <vector>
 #include <sstream>
 
+// btree functions
 template <typename T>
 btree<T>::btree(size_t maxNodeElems) : btree_(new BTree(maxNodeElems)), maxNodeElems_(maxNodeElems) {}
 
 template <typename T>
-btree<T>::btree(const btree<T>& original) {
-    btree_ = original.btree_;        
-    maxNodeElems_ = original.maxNodeElems_;
+btree<T>::btree(const btree<T>& original) : maxNodeElems_(original.maxNodeElems_) {
+    btree_ = BTreePtr(original.btree_->clone());        
 }
 
 template <typename T>
@@ -43,6 +43,7 @@ btree<T>::~btree() {
     btree_->recurClear();
 
 }
+
 // Node functions
 
 template <typename T>
@@ -142,6 +143,27 @@ typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
 }
 
 template <typename T>
+typename btree<T>::Node* btree<T>::BTree::find(const T& elem) const {
+    NodePtr tmp_node(new Node(elem));
+
+    nodes_iterator_type res = nodes_.lower_bound(tmp_node);
+    // check this level
+    if (res != nodes_.end() && (*res)->elem_ == elem) {
+        return (*res).n_;
+    }
+    // check lower levels
+    if (res != nodes_.end()) {
+        if (!(*res)->left_.isNull())
+            return (*res)->left_->find(elem);
+    } else {
+        --res;
+        if (!(*res)->right_.isNull())
+            return (*res)->right_->find(elem);
+    }
+    return Const::null;
+}
+
+template <typename T>
 typename btree<T>::Node* btree<T>::BTree::head() const {
     typename btree<T>::Node& firstNode = **nodes_.begin();
     if (firstNode.left_.isNull()) {
@@ -187,3 +209,42 @@ void btree<T>::BTree::outputBF(vector<string>& strs, size_t level) const {
     }
 }
 
+template <typename T>
+typename btree<T>::BTree* btree<T>::BTree::clone() const {
+    BTree* newTree = new BTree(maxNodeElems_); // clone of this tree
+    BTree* leftTree; // new tree on bottom left
+    BTree* rightTree;
+    
+    // initalize bottom left Tree
+    if (!(*nodes_.begin())->left_.isNull()) {
+        leftTree = (*nodes_.begin())->left_->clone();
+    } else {
+        leftTree = Const::null;
+    }
+
+    for (nodes_iterator_type it = nodes_.begin(); it != nodes_.end(); ++it) {
+        // new node
+        Node* newN = new Node((*it)->elem_);
+        NodePtr newNode(newN);
+        // new bottom right tree
+        if (!(*it)->right_.isNull()) {
+            rightTree = (*it)->right_->clone();
+        } else {
+            rightTree = Const::null;
+        }
+
+        // update pointers in new node
+        newNode->owner_ = BTreePtr(newTree);
+        newNode->left_ = BTreePtr(leftTree);
+        newNode->right_= BTreePtr(rightTree);
+
+        // insert node
+        newTree->nodes_.insert(newNode);
+
+        // update leftTree for next node
+        leftTree = rightTree;
+    }
+
+    return newTree;
+
+}

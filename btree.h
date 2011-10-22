@@ -36,18 +36,16 @@ template <typename T> std::ostream& operator<<(std::ostream& os, const btree<T>&
 template <typename T> 
 class btree {
     public:
-        /** Hmm, need some iterator typedefs here... friends? **/
+        // friends
         friend class btree_iterator<T>;
         friend class btree_const_iterator<T>;
 
+        // typedefs
         typedef btree_iterator<T>       iterator;
         typedef btree_const_iterator<T> const_iterator;
 
         typedef btree_reverse_iterator<const_iterator>  const_reverse_iterator;
         typedef btree_reverse_iterator<iterator>        reverse_iterator;
-
-
-
 
         /**
          * Constructs an empty btree.  Note that
@@ -98,6 +96,9 @@ class btree {
          */
         friend std::ostream& operator<< <T> (std::ostream& os, const btree<T>& tree);
 
+        /**
+         * return iterators to begin or end
+         */
         iterator begin() { return iterator(btree_->head(), this->btree_); } 
         const_iterator begin() const { return const_iterator(btree_->head(), this->btree_); } 
         iterator end() { return iterator(Const::null, this->btree_); } 
@@ -174,18 +175,34 @@ class btree {
 
 
     private:
-
-        typedef std::pair<iterator, bool> insert_res_type;
+        // declarations
         struct BTreePtr;
 
+        // typedefs
+        typedef std::pair<iterator, bool> insert_res_type;
+
+        // btree private members
+        BTreePtr btree_;
+        size_t maxNodeElems_;
+
+        // nested classes
         struct Node {
-            public:
+            // constructors
             Node(const T& e) : elem_(e) { refCount = 0; }
 
+            // members
+            T       elem_;
+            BTreePtr owner_; // the btree this node belongs to. 
+            BTreePtr left_;
+            BTreePtr right_;
+            mutable int refCount;
+
+            // destructor
             ~Node() {
                 clear();
             }
 
+            // functions
             friend std::ostream& operator<<(std::ostream& os, const Node& n) {
                 os << n.elem_;
                 return os;
@@ -214,6 +231,9 @@ class btree {
                 right_ = BTreePtr();    
             }
 
+            /*
+             * recursively clear references below this node
+             */
             void recurClear() {
                 if (!left_.isNull()) left_->recurClear();
                 if (!right_.isNull()) right_->recurClear();
@@ -221,29 +241,31 @@ class btree {
             }
 
 
-            T       elem_;
-            BTreePtr owner_; // the btree this node belongs to. 
-            BTreePtr left_;
-            BTreePtr right_;
-
-            mutable int refCount;
         };
 
         struct NodePtr {
+
+            // constructors
+            NodePtr() : n_(Const::null) {}
+            NodePtr(Node* n) : n_(n) { ++n_->refCount; }
+            NodePtr(const NodePtr& rhs) : n_(rhs.n_) { if (!isNull()) ++n_->refCount; }
+
+            // destructor
+            ~NodePtr() { 
+                if (!isNull() && --n_->refCount == 0) { 
+                    delete n_;
+                } 
+            }
+
+            // members
+            Node* n_;
+
+            // functions
             Node* operator->() { return n_; }
             Node* operator->() const { return n_; }
             Node& operator*() { return *n_; }
             Node& operator*() const { return *n_; }
 
-            NodePtr() : n_(Const::null) {}
-            NodePtr(Node* n) : n_(n) { ++n_->refCount; }
-            ~NodePtr() { 
-                if (!isNull() && --n_->refCount == 0) { 
-                    delete n_;
-                } 
-
-            }
-            NodePtr(const NodePtr& rhs) : n_(rhs.n_) { if (!isNull()) ++n_->refCount; }
             NodePtr& operator=(const NodePtr& rhs) {
                 if (n_ == rhs.n_) 
                     return *this;
@@ -254,7 +276,6 @@ class btree {
                 if (!isNull()) ++n_->refCount;
                 return *this;
             }
-                
 
             friend bool operator< (const NodePtr& l, const NodePtr& r) {
                 return *l < *r;
@@ -266,7 +287,6 @@ class btree {
             }
 
             bool isNull() const { return n_ == Const::null; }
-            Node* n_;
         };
 
         struct BTree {
@@ -274,7 +294,10 @@ class btree {
             typedef set<NodePtr>                    nodes_type;
             typedef typename nodes_type::iterator   nodes_iterator_type;
            
+            // constructor
             BTree(size_t max) : maxNodeElems_(max), refCount(0) { nodes_type nodes(); }
+
+            // destructor
             ~BTree() { 
                 recurClear();
             }
@@ -298,41 +321,31 @@ class btree {
                 return os;
             }
 
-            Node* find(const T& elem) const {
-                NodePtr tmp_node(new Node(elem));
-
-                //cout << " nodes size " << nodes_.size() << endl;
-                nodes_iterator_type res = nodes_.lower_bound(tmp_node);
-                // check this level
-                if (res != nodes_.end() && (*res)->elem_ == elem) {
-                    return (*res).n_;
-                }
-                // check lower levels
-                if (res != nodes_.end()) {
-                    if (!(*res)->left_.isNull())
-                        return (*res)->left_->find(elem);
-                } else {
-                    --res;
-                    if (!(*res)->right_.isNull())
-                        return (*res)->right_->find(elem);
-                }
-                return Const::null;
-            }
+            /*
+             * traverse the tree and return a pointer to a node with value elem
+             * return Const::null if not found
+             */
+            Node* find(const T& elem) const ;
 
             /*
-             * Return a NodePtr to the left-most node
+             * Return a Node* to the left-most node
              */
             Node* head() const;
                       
             /*
-             * Return a NodePtr to the right-most node
+             * Return a Node* to the right-most node
              */       
             Node* tail() const;
 
             /*
-             * output the tree in bread-first order
+             * fill each level of the tree into a vector in bread-first order
              */
             void outputBF(vector<string>& strs, size_t level) const;
+
+            /*
+             * value copy this tree
+             */
+            BTree* clone() const;
 
             /*
              * clear nodes references to other objects
@@ -352,21 +365,27 @@ class btree {
 
         struct BTreePtr {
 
-            BTreePtr(BTree* bt) : btree_(bt) { ++btree_->refCount; } 
-            
-            BTree* operator->() { return btree_; }
-            BTree* operator->() const { return btree_; }
-            BTree& operator*() { return *btree_; }
-            BTree& operator*() const { return *btree_; }
-            
+            // constructor
             BTreePtr() : btree_(Const::null) {}
+            BTreePtr(BTree* bt) : btree_(bt) { if (!isNull()) ++btree_->refCount; } 
+            BTreePtr(const BTreePtr& rhs) : btree_(rhs.btree_) { ++btree_->refCount; }
+
+            // destructor
             ~BTreePtr() { 
                 if (!isNull() && --btree_->refCount == 0) {
                     delete btree_;
                 }  
             }
+            
+            // members
+            BTree* btree_;
 
-            BTreePtr(const BTreePtr& rhs) : btree_(rhs.btree_) { ++btree_->refCount; }
+            // functions
+            BTree* operator->() { return btree_; }
+            BTree* operator->() const { return btree_; }
+            BTree& operator*() { return *btree_; }
+            BTree& operator*() const { return *btree_; }
+
             BTreePtr& operator=(const BTreePtr& rhs) {
                 if (!isNull() && btree_ == rhs.btree_)  {
                     return *this;
@@ -381,15 +400,8 @@ class btree {
             }
             
             bool isNull() const { return btree_ == Const::null; }
-            BTree* btree_;
         };
 
-        // private members
-        BTreePtr btree_;
-        size_t maxNodeElems_;
-        
-        // private functions
-        bool isNull() const { return btree_ == Const::null; }
 
 };
 

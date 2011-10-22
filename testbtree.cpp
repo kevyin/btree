@@ -181,3 +181,26 @@ BOOST_AUTO_TEST_CASE( test_find ) {
     it = tree.find('C');
     BOOST_CHECK(it == tree.end());
 }
+
+BOOST_AUTO_TEST_CASE( test_clone) {
+    cout << "BOOST TEST: clone" << endl;
+    btree<char> tree(4);
+    BOOST_CHECK_EQUAL(tree.maxNodeElems_, 4);
+    BOOST_CHECK_EQUAL(tree.btree_->nodeElems(), 0);
+
+    tree.insert('M');
+
+    tree.insert('P');
+    tree.insert('X');
+    tree.insert('G');
+    tree.insert('T');
+    tree.insert('A');
+
+    cout << "tree2" << endl;
+    btree<char> tree2 = tree;
+    cout << "tree3" << endl;
+    btree<char> tree3(tree);
+
+    cout << tree2 << endl;
+    cout << tree3 << endl;
+}
