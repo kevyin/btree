@@ -110,6 +110,10 @@ typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
 
         return typename btree<T>::insert_res_type(btree_iterator<T>(new_node.n_), res.second);
     } else { // put the elem in a sub-btree
+        // check if elem is already in this level
+        nodes_iterator_type found = nodes_.find(new_node);
+        if (found != nodes_.end())
+            return typename btree<T>::insert_res_type(btree_iterator<T>(found->n_), false);
         // find pos of subtree to insert
         nodes_iterator_type pos = nodes_.lower_bound(new_node);
         nodes_iterator_type top_right = pos;

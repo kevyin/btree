@@ -191,11 +191,15 @@ BOOST_AUTO_TEST_CASE( test_clone) {
     tree.insert('M');
 
     tree.insert('P');
+    tree.insert('P');
     tree.insert('X');
     tree.insert('G');
     tree.insert('T');
+    tree.insert('T');
     tree.insert('A');
 
+    cout << "tree" << endl;
+    cout << tree << endl;
     cout << "tree2" << endl;
     btree<char> tree2 = tree;
     cout << "tree3" << endl;
@@ -203,4 +207,38 @@ BOOST_AUTO_TEST_CASE( test_clone) {
 
     cout << tree2 << endl;
     cout << tree3 << endl;
+
+    btree<char>::iterator it;
+    for (it = tree.begin(); it != tree.end(); ++it) {
+        cout << *it;
+    }
+}
+
+BOOST_AUTO_TEST_CASE( test_int) {
+    cout << "BOOST TEST: int" << endl;
+    btree<int> b(4);
+  b.insert(2);
+  b.insert(200);
+  b.insert(50);
+  b.insert(4);
+  b.insert(2);
+  b.insert(1200);
+  b.insert(150);
+  b.insert(14);
+  b.insert(12);
+  b.insert(11200);
+  b.insert(-150);
+  b.insert(-14);
+  b.insert(212);
+  b.insert(-200);
+  b.insert(-50);
+  b.insert(-4);
+
+    cout << b << endl;
+
+    btree<int>::iterator it;
+    for (it = b.begin(); it != b.end(); ++it) {
+        cout << *it << endl;
+    }
+
 }
