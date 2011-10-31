@@ -108,7 +108,7 @@ typename btree<T>::insert_res_type btree<T>::BTree::insert(const T& elem) {
         new_node->owner_ = BTreePtr(this);
         pair< typename btree<T>::BTree::nodes_type::iterator, bool> res = nodes_.insert(new_node);
 
-        return typename btree<T>::insert_res_type(btree_iterator<T>(new_node.n_), res.second);
+        return typename btree<T>::insert_res_type(btree_iterator<T>(res.first->n_), res.second);
     } else { // put the elem in a sub-btree
         // check if elem is already in this level
         nodes_iterator_type found = nodes_.find(new_node);
