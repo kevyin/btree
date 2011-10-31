@@ -28,7 +28,9 @@ class btree_iterator {
     reference operator*() const { return pointee_->elem_; }
     pointer operator->() const { return pointee_; }
     btree_iterator& operator++();
+    void operator++(int) { ++(*this); }
     btree_iterator& operator--();
+    void operator--(int) { --(*this); }
     bool operator==(const btree_iterator& other) const { return this->pointee_ == other.pointee_; } 
     bool operator!=(const btree_iterator& other) const { return !operator==(other); }
 
@@ -62,7 +64,9 @@ class btree_const_iterator {
     reference operator*() const { return pointee_->elem_; }
     pointer operator->() const { return pointee_; }
     btree_const_iterator& operator++();
+    void operator++(int) { ++(*this); }
     btree_const_iterator& operator--();
+    void operator--(int) { --(*this); }
     bool operator==(const btree_const_iterator& other) const { return this->pointee_ == other.pointee_; } 
     bool operator!=(const btree_const_iterator& other) const { return !operator==(other); }
 
@@ -72,6 +76,8 @@ class btree_const_iterator {
                                                         btree_(btptr.btree_) {}
 
     // converstions from non-const to const version of iterator
+    btree_const_iterator(const btree_iterator<T>& nonConstIt) : pointee_(nonConstIt.pointee_),
+                                                                btree_(nonConstIt.btree_) {}
     btree_const_iterator& operator=(const btree_iterator<T>& nonConstIt) {
         pointee_ = nonConstIt.pointee_;
         btree_ = nonConstIt.btree_;
@@ -109,7 +115,9 @@ class btree_reverse_iterator {
     }
     pointer operator->() const { return &(operator*()); }
     btree_reverse_iterator& operator++() { --current_; return *this; } 
+    void operator++(int) { ++(*this); } 
     btree_reverse_iterator& operator--() { ++current_; return *this; }
+    void operator--(int) { --(*this); }
 
     bool operator==(const btree_reverse_iterator& other) const { return base() == other.base(); }
     bool operator!=(const btree_reverse_iterator& other) const { return !operator==(other); }

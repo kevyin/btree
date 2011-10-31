@@ -52,4 +52,3 @@ btree_const_iterator<T>& btree_const_iterator<T>::operator--() {
 
     return *this;
 }
-
