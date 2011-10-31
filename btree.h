@@ -83,7 +83,7 @@ class btree {
          *
          * @param rhs a const reference to a B-Tree object
          */
-        btree<T>& operator=(const btree<T>& rhs) { return btree<T>(rhs); }
+        btree<T>& operator=(const btree<T>& rhs);
 
         /**
          * Puts a breadth-first traversal of the B-Tree onto the output
